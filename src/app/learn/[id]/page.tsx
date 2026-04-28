@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getModule, modules, type Block } from "@/data/modules";
+import { quizFor } from "@/data/quizzes";
 import ModuleCompletionButton from "@/components/learn/ModuleCompletionButton";
+import Quiz from "@/components/learn/Quiz";
 import Callout from "@/components/learn/blocks/Callout";
 import ComparisonTable from "@/components/learn/blocks/ComparisonTable";
 import WorkedExample from "@/components/learn/blocks/WorkedExample";
@@ -103,7 +105,11 @@ export default async function ModulePage({ params }: ModulePageProps) {
         ))}
       </div>
 
-      <div className="mt-12 flex flex-wrap items-center gap-3">
+      <div className="mt-12">
+        <Quiz questions={quizFor(m.id)} />
+      </div>
+
+      <div className="mt-10 flex flex-wrap items-center gap-3">
         <ModuleCompletionButton moduleId={m.id} />
         {prev && (
           <Link href={`/learn/${prev.id}`} className="btn">
