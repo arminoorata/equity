@@ -54,6 +54,9 @@ const initialProfile: Profile = {
 type PortalContextValue = {
   profile: Profile;
   setProfile: (next: Profile) => void;
+  completedModules: Record<string, true>;
+  markModuleComplete: (id: string) => void;
+  unmarkModuleComplete: (id: string) => void;
   resetAll: () => void;
 };
 
@@ -61,11 +64,30 @@ const PortalContext = createContext<PortalContextValue | null>(null);
 
 export function PortalProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile>(initialProfile);
+  const [completedModules, setCompletedModules] = useState<
+    Record<string, true>
+  >({});
+
+  const markModuleComplete = useCallback((id: string) => {
+    setCompletedModules((prev) =>
+      prev[id] ? prev : { ...prev, [id]: true as const },
+    );
+  }, []);
+
+  const unmarkModuleComplete = useCallback((id: string) => {
+    setCompletedModules((prev) => {
+      if (!prev[id]) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }, []);
 
   // Reset clears in-memory state plus the BYOK key (sessionStorage and
   // localStorage). Theme preference is intentionally preserved.
   const resetAll = useCallback(() => {
     setProfile(initialProfile);
+    setCompletedModules({});
     if (typeof window === "undefined") return;
     try {
       sessionStorage.removeItem("anthropic_key");
@@ -77,8 +99,21 @@ export function PortalProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<PortalContextValue>(
-    () => ({ profile, setProfile, resetAll }),
-    [profile, resetAll],
+    () => ({
+      profile,
+      setProfile,
+      completedModules,
+      markModuleComplete,
+      unmarkModuleComplete,
+      resetAll,
+    }),
+    [
+      profile,
+      completedModules,
+      markModuleComplete,
+      unmarkModuleComplete,
+      resetAll,
+    ],
   );
 
   return (
