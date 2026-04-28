@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getModule, modules } from "@/data/modules";
+import { getModule, modules, type Block } from "@/data/modules";
 import ModuleCompletionButton from "@/components/learn/ModuleCompletionButton";
+import Callout from "@/components/learn/blocks/Callout";
+import ComparisonTable from "@/components/learn/blocks/ComparisonTable";
+import WorkedExample from "@/components/learn/blocks/WorkedExample";
+import WidgetSlot from "@/components/learn/blocks/WidgetSlot";
 
 type ModulePageProps = {
   params: Promise<{ id: string }>;
@@ -28,6 +32,10 @@ export async function generateMetadata({ params }: ModulePageProps) {
  * Module detail page at /learn/[id]. Server-rendered and statically
  * generated. The "Mark complete" toggle lives in a small client
  * component that talks to PortalContext.
+ *
+ * Each section gets a stable anchor id so individual concepts are
+ * deep-linkable (e.g. /learn/isos#amt-trap). Section headings render
+ * as clickable anchors.
  */
 export default async function ModulePage({ params }: ModulePageProps) {
   const { id } = await params;
@@ -67,21 +75,30 @@ export default async function ModulePage({ params }: ModulePageProps) {
         </p>
       </header>
 
-      <div className="mt-10 space-y-8">
-        {m.sections.map((section, i) => (
-          <section key={i}>
+      <div className="mt-10 space-y-10">
+        {m.sections.map((section) => (
+          <section
+            key={section.id}
+            id={section.id}
+            className="scroll-mt-24"
+          >
             <h2
               className="text-lg font-semibold"
               style={{ color: "var(--text)" }}
             >
-              {section.heading}
+              <a
+                href={`#${section.id}`}
+                className="hover:underline underline-offset-4"
+                style={{ color: "inherit" }}
+              >
+                {section.heading}
+              </a>
             </h2>
-            <p
-              className="mt-2 text-[15px] leading-7"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              {section.body}
-            </p>
+            <div className="mt-3 space-y-4">
+              {section.blocks.map((block, i) => (
+                <BlockView key={i} block={block} />
+              ))}
+            </div>
           </section>
         ))}
       </div>
@@ -113,4 +130,44 @@ export default async function ModulePage({ params }: ModulePageProps) {
       </p>
     </main>
   );
+}
+
+function BlockView({ block }: { block: Block }) {
+  switch (block.type) {
+    case "paragraph":
+      return (
+        <p
+          className="text-[15px] leading-7"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          {block.text}
+        </p>
+      );
+    case "callout":
+      return (
+        <Callout
+          severity={block.severity}
+          title={block.title}
+          body={block.body}
+        />
+      );
+    case "table":
+      return (
+        <ComparisonTable
+          caption={block.caption}
+          headers={block.headers}
+          rows={block.rows}
+        />
+      );
+    case "worked-example":
+      return (
+        <WorkedExample
+          title={block.title}
+          lines={block.lines}
+          footnote={block.footnote}
+        />
+      );
+    case "widget":
+      return <WidgetSlot widget={block.widget} />;
+  }
 }
