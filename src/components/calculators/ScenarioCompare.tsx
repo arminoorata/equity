@@ -192,7 +192,7 @@ function ScenarioCard({
               color: "var(--accent)",
             }}
           >
-            Highest net
+            Highest modeled net
           </span>
         )}
       </div>

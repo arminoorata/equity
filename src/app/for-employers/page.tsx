@@ -227,6 +227,41 @@ export default function ForEmployersPage() {
           </p>
         </Block>
 
+        <Block heading="A blurb you can copy">
+          <p>
+            For Slack, an onboarding email, or a refresh-grant comm.
+            Edit to taste.
+          </p>
+          <blockquote
+            className="rounded-md border-l-4 px-4 py-3"
+            style={{
+              borderColor: "var(--accent)",
+              background: "var(--surface)",
+              color: "var(--text)",
+            }}
+          >
+            <p className="text-[14.5px] leading-7">
+              Heads up that there&rsquo;s a free, public equity
+              education tool at{" "}
+              <span
+                className="mono"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                equity.arminoorata.com
+              </span>{" "}
+              that we like for general concepts. It covers ISOs, NSOs,
+              RSUs, AMT, vesting, leaving, and liquidity events, with
+              calculators that take your own numbers. It&rsquo;s
+              educational, not company policy. Anything specific to our
+              plan, our 409A, or our acceleration terms lives in your
+              grant documents; our equity team is the source of truth.
+              The Ask tab uses third-party AI; only use it if our policy
+              permits, and don&rsquo;t upload plan documents unless our
+              policy specifically allows that.
+            </p>
+          </blockquote>
+        </Block>
+
         <Block heading="A note on voice">
           <p>
             The modules are written in first person, in a Total Rewards
