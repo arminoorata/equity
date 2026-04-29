@@ -104,6 +104,21 @@ export const modules: LearnModule[] = [
           { type: "widget", widget: "vesting-timeline" },
         ],
       },
+      {
+        id: "83b-flag",
+        heading: "If your grant lets you early-exercise: 83(b)",
+        blocks: [
+          p(
+            "Some companies let you exercise options before they vest. If you do, an 83(b) election lets you be taxed at today's (low) value instead of waiting until vesting. The tax savings can be substantial. There is a 30-day deadline from the exercise date. No extensions.",
+          ),
+          {
+            type: "callout",
+            severity: "red",
+            title: "30-day deadline, no extensions",
+            body: "Miss the 30 days and you forfeit the favorable treatment forever. Same applies if you receive restricted stock subject to vesting. If 83(b) might apply to you, talk to a tax advisor immediately, not after the dust settles.",
+          },
+        ],
+      },
     ],
   },
   // ────────────────────────────────────────────────────────────────
@@ -292,6 +307,24 @@ export const modules: LearnModule[] = [
         ],
       },
       {
+        id: "if-you-moved",
+        heading: "If you moved during vesting",
+        blocks: [
+          p(
+            "RSUs settling at vest get taxed as W-2 income for the state where you earned them. If you moved during the vesting period, multiple states want a piece of the same shares.",
+          ),
+          {
+            type: "callout",
+            severity: "amber",
+            title: "Source-of-income rules vary",
+            body: "California, New York, Massachusetts, and a handful of other states allocate RSU income across the period the shares were earned, not just where you live at vest. If you moved between any of those, you may owe tax to a state you no longer live in. Confirm with a CPA who works across state lines.",
+          },
+          p(
+            "Two practical moves. Keep your work-location history (and dates) for every quarter your RSUs were vesting. And ask your equity team or payroll how they handle multi-state withholding before the first vest after a move.",
+          ),
+        ],
+      },
+      {
         id: "rsus-vs-options",
         heading: "RSUs vs options",
         blocks: [
@@ -475,6 +508,294 @@ export const modules: LearnModule[] = [
           },
           p(
             "If your company has a public market, build a sale plan. If it doesn't, treat equity as upside, not income.",
+          ),
+        ],
+      },
+      {
+        id: "pre-liquidity-playbook",
+        heading: "Pre-liquidity playbook",
+        blocks: [
+          p(
+            "If a tender offer or IPO is on the horizon, the most common mistake is doing nothing until the announcement. By then your tax-planning options narrow. The shape of what to do, working backwards from the event:",
+          ),
+          {
+            type: "table",
+            caption: "Educational framing only. Talk to a tax advisor about your specific situation.",
+            headers: ["When", "What to do"],
+            rows: [
+              [
+                "12+ months out",
+                "Pull together your basis records (grant date, strike, exercise date, FMV at exercise). Find a CPA who has handled equity events before.",
+              ],
+              [
+                "6 to 12 months out",
+                "Model AMT scenarios if you hold ISOs and have not exercised. Pre-funding an exercise gets cheaper the earlier you do it.",
+              ],
+              [
+                "3 to 6 months out",
+                "Decide your sale plan in advance. Tender percentages, lock-up windows, and tax-year edges all matter. Write it down before adrenaline takes over.",
+              ],
+              [
+                "60 days out",
+                "Confirm your exercise window if you might leave. Confirm withholding mechanics with your equity team. Block off time for the paperwork.",
+              ],
+              [
+                "Day of",
+                "Don't make irreversible moves on the announcement day. Sleep on it. Let your CPA model the actual numbers.",
+              ],
+            ],
+          },
+          {
+            type: "callout",
+            severity: "amber",
+            title: "The plan is the point",
+            body: "The expensive part of a liquidity event is often the rushed decisions, not the tax bill itself. A rough plan beats no plan, every time.",
+          },
+        ],
+      },
+    ],
+  },
+  // ────────────────────────────────────────────────────────────────
+  {
+    id: "leaving",
+    title: "Leaving",
+    icon: "🚪",
+    minutes: 5,
+    blurb:
+      "The 90-day clock, what happens to unvested shares, and the 83(b) caveat if you early-exercised.",
+    sections: [
+      {
+        id: "the-clock",
+        heading: "The post-termination clock",
+        blocks: [
+          p(
+            "When you leave a company, your unvested options stop vesting that day. Your vested options usually have a fixed window after termination during which you can still exercise them. After that window, they expire and the shares are gone.",
+          ),
+          {
+            type: "callout",
+            severity: "red",
+            title: "The historical default is 90 days",
+            body: "Some companies offer 5 to 10 years now (Pinterest and Coinbase set the example). Some offer less than 90 days. The number in your plan document is the one that controls whether the option still exists. Find it before you give notice.",
+          },
+          {
+            type: "callout",
+            severity: "amber",
+            title: "ISOs have a separate 3-month rule",
+            body: "Federal tax law requires ISO exercise within 3 months of employment ending to keep ISO tax treatment. Past 90 days, the option may still be exercisable under your plan, but it gets taxed as an NSO (ordinary income on the spread at exercise). Two clocks: your plan window and the 3-month ISO clock. Often they line up. Sometimes they don't.",
+          },
+        ],
+      },
+      {
+        id: "what-it-costs",
+        heading: "What it costs to exercise",
+        blocks: [
+          p(
+            "Two pieces. First, the strike price times your vested shares. That's the cash you owe the company for the shares. Second, depending on grant type, tax. NSOs trigger ordinary income tax on the spread at exercise. ISOs trigger AMT exposure (which may or may not produce an actual tax bill, but counts toward your tax picture).",
+          ),
+          { type: "widget", widget: "vesting-timeline" },
+          p(
+            "Use the post-termination calculator in the Exercise tab to see your number with your specific grant and current FMV.",
+          ),
+        ],
+      },
+      {
+        id: "if-you-early-exercised",
+        heading: "If you early-exercised",
+        blocks: [
+          p(
+            "If your company allowed early exercise and you took it, the unvested shares you bought get repurchased by the company at your original strike price when you leave. You don't get the tax you paid back. The 83(b) election locked in your tax basis at today's FMV when you exercised; the company's repurchase right unwinds that for the unvested portion only.",
+          ),
+          {
+            type: "callout",
+            severity: "amber",
+            title: "Don't early-exercise more than you can afford to forfeit",
+            body: "If the company succeeds and you stay, this is great. If you leave before the shares vest, you lose them, and the tax doesn't come back. The math has to work both ways.",
+          },
+        ],
+      },
+      {
+        id: "what-vests-on-the-way-out",
+        heading: "What vests on the way out",
+        blocks: [
+          p(
+            "Most plans use cliff vesting. If you leave before your one-year cliff, you typically get nothing. After the cliff, your vested portion is yours; everything past your last day stops accruing.",
+          ),
+          p(
+            "Some plans have acceleration provisions on a change of control or termination without cause. Those are negotiated up front and live in your offer paperwork. Read it.",
+          ),
+        ],
+      },
+      {
+        id: "leaving-checklist",
+        heading: "A checklist for the day you give notice",
+        blocks: [
+          {
+            type: "callout",
+            severity: "info",
+            title: "Five things to do before HR has your laptop",
+            body:
+              "1. Find your exact post-termination exercise window in the plan document.\n" +
+              "2. Pull a current FMV from the equity team or your last 409A.\n" +
+              "3. List your vested option count and your strike price.\n" +
+              "4. Decide a partial-exercise number you can fund without strain.\n" +
+              "5. Talk to a CPA before you wire money. Same week, not same year.",
+          },
+        ],
+      },
+    ],
+  },
+  // ────────────────────────────────────────────────────────────────
+  {
+    id: "case-study",
+    title: "Case study: Maya",
+    icon: "📖",
+    minutes: 8,
+    blurb:
+      "One person, grant date through IPO. The decisions that mattered, the ones that didn't, and what she'd do differently.",
+    sections: [
+      {
+        id: "intro",
+        heading: "The setup",
+        blocks: [
+          p(
+            "Maya joined a Series B startup in 2018. She received 8,000 ISOs at a $0.40 strike, vesting over four years with a one-year cliff. Her grant letter mentioned a 90-day post-termination exercise window.",
+          ),
+          p(
+            "She was 28. The job paid well enough that the equity felt like a bonus. She filed the grant letter and didn't think about it for a year.",
+          ),
+        ],
+      },
+      {
+        id: "year-2",
+        heading: "Year 2: the first decision she didn't know she was making",
+        blocks: [
+          p(
+            "After the cliff, Maya had 2,000 vested ISOs at $0.40 strike. The company's 409A had moved to $1.20.",
+          ),
+          {
+            type: "worked-example",
+            title: "Her exercise math at year 2",
+            lines: [
+              "Vested options: 2,000",
+              "Cost to exercise: 2,000 × $0.40 = $800",
+              "Spread at exercise: ($1.20 − $0.40) × 2,000 = $1,600",
+              "AMT exposure: $1,600 (probably no AMT triggered at her income)",
+            ],
+          },
+          p(
+            "She didn't exercise. She didn't know that exercising early would have started her long-term capital gains clock at the cheapest possible spread.",
+          ),
+        ],
+      },
+      {
+        id: "year-3",
+        heading: "Year 3: the unicorn round",
+        blocks: [
+          p(
+            "The company raised a Series D at a $5B valuation. The 409A jumped to $25 a share. Tech press called it a unicorn.",
+          ),
+          {
+            type: "worked-example",
+            title: "Her exercise math at year 3",
+            lines: [
+              "Vested options: 4,000",
+              "Cost to exercise: 4,000 × $0.40 = $1,600",
+              "Spread at exercise: ($25 − $0.40) × 4,000 = $98,400",
+              "AMT exposure: $98,400 (now a real AMT problem)",
+            ],
+          },
+          {
+            type: "callout",
+            severity: "red",
+            title: "The cost of waiting",
+            body: "Same shares, same strike. Twelve months earlier the AMT exposure was $1,600. Now it's nearly $100K. Maya could not afford to exercise without a real tax conversation.",
+          },
+        ],
+      },
+      {
+        id: "year-5",
+        heading: "Year 5: the tender",
+        blocks: [
+          p(
+            "The company ran a tender offer at $40 a share. Employees could sell up to 25% of their vested shares. Maya, fully vested with 8,000 options, qualified to sell 2,000.",
+          ),
+          p(
+            "She had still not exercised. To participate, she had to exercise the 2,000 (cost: $800) and sell them in the same tender window. Same-year exercise and sale is a disqualifying disposition for ISOs, so the spread was taxed as ordinary income, not as AMT. Her CPA estimated a five-figure ordinary-income tax hit on the $40 minus $0.40 spread.",
+          ),
+          {
+            type: "callout",
+            severity: "amber",
+            title: "Same-year exercise and sale = disqualifying disposition",
+            body: "If she had wanted the friendlier ISO treatment on the tendered shares, she would have needed to exercise at least a year earlier and hold past the tender. The tender itself made qualifying impossible.",
+          },
+          p(
+            "She participated anyway. After tax, the cash from the tender funded her down payment. The remaining 6,000 options stayed unexercised because she still could not comfortably cover the AMT exposure on a full exercise.",
+          ),
+        ],
+      },
+      {
+        id: "year-6",
+        heading: "Year 6: starting the clock",
+        blocks: [
+          p(
+            "After working with her CPA, Maya exercised her remaining 6,000 options 4 months before the rumored IPO. The 409A had moved to $30. Spread at exercise: ($30 minus $0.40) times 6,000 = $177,600. AMT exposure was significant, and she pre-funded estimated tax payments to cover it.",
+          ),
+          p(
+            "By exercising and holding, she started the long-term holding clock. The grant date was already far enough back that the 2-year-from-grant rule was satisfied. The remaining requirement was 1 year past exercise.",
+          ),
+          {
+            type: "callout",
+            severity: "green",
+            title: "The clock she should have started in year 2",
+            body: "This is the move she didn't make at the cliff. Late is better than never, and waiting any longer would have meant exercising at IPO-day FMV.",
+          },
+        ],
+      },
+      {
+        id: "year-7",
+        heading: "Year 7: IPO",
+        blocks: [
+          p(
+            "The company IPO'd. Lock-up was 180 days. By the time the lock-up expired, Maya was about 10 months past her year-6 exercise. Selling then would have been a disqualifying disposition (still under 1 year from exercise), with the spread taxed as ordinary income.",
+          ),
+          p(
+            "She waited the additional 2 months. After the 1-year-from-exercise mark, her sale qualified for long-term capital gains treatment on the entire gain from strike to sale. The AMT she had pre-funded in year 6 became a minimum-tax credit she carried into the next several tax years.",
+          ),
+          {
+            type: "callout",
+            severity: "green",
+            title: "Patience past the lock-up paid off",
+            body: "Selling at lock-up end would have been disqualifying. Two more months of waiting flipped the entire gain to LTCG treatment. The decision Maya made in year 6 was what made the year-7 patience worth something.",
+          },
+        ],
+      },
+      {
+        id: "what-she-would-do-differently",
+        heading: "What she'd do differently",
+        blocks: [
+          p(
+            "Three things, in priority order:",
+          ),
+          {
+            type: "callout",
+            severity: "info",
+            title: "1. Exercise after the cliff, not after the unicorn round",
+            body: "When the spread is small, the AMT is small, and the long-term clock starts. The biggest single mistake was waiting.",
+          },
+          {
+            type: "callout",
+            severity: "info",
+            title: "2. Find a CPA before the first liquidity event, not during",
+            body: "By the time the tender was announced, her decision window was 30 days. A CPA who understood equity could have modeled the trade-offs in advance.",
+          },
+          {
+            type: "callout",
+            severity: "info",
+            title: "3. Treat the grant letter as a budget, not a bonus",
+            body: "Reading it in year 1 instead of year 2 would have changed every other decision.",
+          },
+          p(
+            "Maya did fine in the end. Most of the people in her cohort did not, because the same decisions Maya almost got wrong, others did get wrong. The tools, the calendar, and a five-page grant letter would have been enough.",
           ),
         ],
       },

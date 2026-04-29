@@ -441,6 +441,106 @@ export const quizzes: Record<string, QuizQuestion[]> = {
       ],
     },
   ],
+  leaving: [
+    {
+      id: "post-termination-window",
+      prompt:
+        "You give notice on Friday and your plan says you have a 90-day post-termination exercise window. What happens if you do nothing?",
+      options: [
+        {
+          label: "Your vested options stay forever",
+          correct: false,
+          explanation:
+            "They don't. Vested options come with a fixed window after termination, and after that window they expire.",
+        },
+        {
+          label:
+            "Your vested options expire 90 days after your last day. They're gone.",
+          correct: true,
+          explanation:
+            "Right. The clock is the most common reason vested options get forfeited. Find the exact number in your plan document and put the deadline in your calendar.",
+        },
+        {
+          label:
+            "The company is required to give you an extension if you ask for one",
+          correct: false,
+          explanation:
+            "Some companies extend their windows by default (5 to 10 years). Most don't, and there's no requirement to grant an extension.",
+        },
+        {
+          label: "Unvested options keep vesting on their old schedule",
+          correct: false,
+          explanation:
+            "Unvested options stop vesting on your last day, with rare exceptions in negotiated severance.",
+        },
+      ],
+    },
+    {
+      id: "early-exercised-leaver",
+      prompt:
+        "You early-exercised 4,000 unvested NSOs at a $1 strike with an 83(b) election. You leave 18 months later, with only 2,000 vested. What happens?",
+      options: [
+        {
+          label: "You keep all 4,000 shares",
+          correct: false,
+          explanation:
+            "The unvested portion typically gets repurchased by the company at your original strike. You keep the 2,000 vested.",
+        },
+        {
+          label: "The company repurchases your 2,000 unvested shares at $1",
+          correct: true,
+          explanation:
+            "Right. The unvested shares unwind. The strike money you paid for those 2,000 shares comes back, but the tax you paid on the spread doesn't.",
+        },
+        {
+          label: "You get a refund of all the tax you paid at exercise",
+          correct: false,
+          explanation:
+            "That's the catch with early exercise. Taxes you paid on the unvested portion don't come back if you leave before vest.",
+        },
+        {
+          label:
+            "The company has to let you keep all 4,000 because you filed 83(b)",
+          correct: false,
+          explanation:
+            "83(b) sets your tax basis. It doesn't override the company's repurchase right on unvested shares.",
+        },
+      ],
+    },
+  ],
+  "case-study": [
+    {
+      id: "year-2-mistake",
+      prompt:
+        "Looking at Maya's year 2 numbers, what was the cheapest moment to start her long-term capital gains clock?",
+      options: [
+        {
+          label: "Wait for the unicorn round",
+          correct: false,
+          explanation:
+            "The unicorn round made the AMT exposure 60x larger. That's the opposite of cheap.",
+        },
+        {
+          label: "Exercise her vested options when the spread was small",
+          correct: true,
+          explanation:
+            "Right. When FMV is barely above strike, AMT is barely a thing. Exercising early started the LTCG clock at minimal tax cost.",
+        },
+        {
+          label: "Wait until the tender so she had cash to cover taxes",
+          correct: false,
+          explanation:
+            "By the tender, the spread was huge. Cash from the tender helped cover the tax, but she ended up with a much bigger bill than if she'd exercised earlier.",
+        },
+        {
+          label: "Wait until IPO and exercise then",
+          correct: false,
+          explanation:
+            "Exercising at IPO means the spread is at IPO-day FMV. If she exercises and sells inside the same year, that's a disqualifying disposition for ISOs and the entire spread is taxed as ordinary income. If she exercises and holds, she's exposed to AMT on the full spread. Late exercise is the most expensive exercise either way.",
+        },
+      ],
+    },
+  ],
 };
 
 export function quizFor(moduleId: string): QuizQuestion[] {

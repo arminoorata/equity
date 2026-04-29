@@ -2,7 +2,7 @@
  * Learning paths for the "What do you have?" selector on the Learn
  * home. Each path picks an ordered subset of module ids that's most
  * relevant for the selected grant type. The "all" path is the
- * default order — used when the user picks "Not sure" or "Mix" or
+ * default order, used when the user picks "Not sure" or "Mix" or
  * hasn't picked anything.
  */
 
@@ -13,18 +13,18 @@ export type GrantType = "iso" | "nso" | "rsu" | "mix" | "unsure";
 const allIds = modules.map((m) => m.id);
 
 export const learningPaths: Record<GrantType, string[]> = {
-  iso: ["basics", "isos", "tax", "liquidity", "nsos", "rsus"],
-  nso: ["basics", "nsos", "tax", "liquidity", "isos", "rsus"],
-  rsu: ["basics", "rsus", "tax", "liquidity", "isos", "nsos"],
-  mix: ["basics", "isos", "nsos", "rsus", "tax", "liquidity"],
+  iso: ["basics", "isos", "tax", "leaving", "liquidity", "case-study", "nsos", "rsus"],
+  nso: ["basics", "nsos", "tax", "leaving", "liquidity", "case-study", "isos", "rsus"],
+  rsu: ["basics", "rsus", "tax", "liquidity", "leaving", "case-study", "isos", "nsos"],
+  mix: ["basics", "isos", "nsos", "rsus", "tax", "leaving", "liquidity", "case-study"],
   unsure: allIds,
 };
 
 export const pathLeadIns: Record<GrantType, string> = {
-  iso: "Start with the basics, then ISOs, then how it shows up at tax time.",
-  nso: "Start with the basics, then NSOs, then how it shows up at tax time.",
-  rsu: "Start with the basics, then RSUs, then how it shows up at tax time.",
-  mix: "If you have a mix, work through them in this order. Tax scenarios pulls from all three.",
+  iso: "Start with the basics, then ISOs, then how it shows up at tax time. The Leaving module covers the 90-day clock if you ever leave.",
+  nso: "Start with the basics, then NSOs, then how it shows up at tax time. The Leaving module covers the 90-day clock if you ever leave.",
+  rsu: "Start with the basics, then RSUs, then how it shows up at tax time. The Leaving module is short but worth reading once.",
+  mix: "If you have a mix, work through them in this order. The case study at the end pulls everything together.",
   unsure:
-    "Start at the top. If you don't know what you have, the first module covers the basics.",
+    "Start at the top. If you don't know what you have, the first module covers the basics. The case study at the end shows how the pieces fit together.",
 };
