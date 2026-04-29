@@ -151,6 +151,19 @@ body {
   font-feature-settings: "tnum" 1, "lnum" 1;
 }
 
+/* Visible focus styles for native form controls inside the Learn
+   widgets. Tailwind's focus-visible rules don't always carry through
+   to <input> when the input is wrapped in a styled span, so we set a
+   concrete focus ring on the wrapper and a matching outline on the
+   input itself. Both fire on keyboard focus only (focus-visible). */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* ── Theme toggle icons ──
    Both icons absolutely-stacked. CSS keys off html[data-theme] to show
    one and hide the other with a subtle rotate+fade. */
