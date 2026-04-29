@@ -35,9 +35,25 @@ export default function SiteFooter() {
               Free tools for total rewards, equity, and the systems around people.
             </p>
           </div>
-          <p className="text-xs uppercase tracking-[0.24em]">
-            equity.arminoorata.com
-          </p>
+          <div className="flex flex-col gap-1 text-xs md:items-end">
+            <Link
+              href="/for-employers"
+              className="underline underline-offset-4"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              For HR &amp; Total Rewards leaders
+            </Link>
+            <Link
+              href="/methodology"
+              className="underline underline-offset-4"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              Methodology &amp; sources
+            </Link>
+            <p className="mt-2 uppercase tracking-[0.24em]">
+              equity.arminoorata.com
+            </p>
+          </div>
         </div>
 
         <p
