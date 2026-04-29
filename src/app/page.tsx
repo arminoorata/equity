@@ -32,7 +32,7 @@ export default function LearnPage() {
           Equity Education Portal
         </p>
         <div
-          className="mt-4 space-y-4 text-base leading-7 md:text-lg md:leading-[1.6]"
+          className="mt-4 space-y-4 text-base leading-7"
           style={{ color: "var(--text)" }}
         >
           <p>
