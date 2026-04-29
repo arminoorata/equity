@@ -1,16 +1,36 @@
-import TabPlaceholder from "@/components/tab/TabPlaceholder";
+import VestingView from "@/components/vesting/VestingView";
 
 export const metadata = { title: "Vesting" };
 
+/**
+ * Vesting tab. Two sub-views: Schedule (timeline + summary cards) and
+ * Lifecycle (stage bar + value at each stage). Empty state when no
+ * grants exist. Wraps the client view component.
+ */
 export default function VestingPage() {
   return (
-    <TabPlaceholder eyebrow="Vesting" title="See your schedule.">
-      <p>
-        Once you set up your grants, this tab shows your vesting timeline
-        month by month, plus a Lifecycle view that maps your grant from
-        cliff through to liquidity event.
+    <main className="mx-auto max-w-5xl px-6 py-12 md:px-10 md:py-16">
+      <p
+        className="text-xs font-medium uppercase tracking-[0.32em]"
+        style={{ color: "var(--accent)" }}
+      >
+        Vesting
       </p>
-      <p>Coming soon. Set up your grants now and they will be ready when this lands.</p>
-    </TabPlaceholder>
+      <h1 className="mt-3 text-3xl font-medium tracking-tight md:text-4xl">
+        See your schedule.
+      </h1>
+      <p
+        className="mt-3 max-w-2xl text-base leading-7"
+        style={{ color: "var(--text-secondary)" }}
+      >
+        Once your grants are entered, the schedule view shows what is
+        vested today, what is next, and the full timeline. The lifecycle
+        view maps the same numbers across the stages your grant moves
+        through.
+      </p>
+      <div className="mt-8">
+        <VestingView />
+      </div>
+    </main>
   );
 }

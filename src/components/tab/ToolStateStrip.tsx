@@ -1,17 +1,25 @@
 "use client";
 
 import { usePortal } from "@/lib/state/PortalContext";
+import { modules } from "@/data/modules";
 
 /**
  * Thin secondary row inside `app-main`. Renders only when at least one
- * grant exists. Phase 2 ships a minimal version: grant chips on the
- * left, Reset on the right. Phase 3+ adds Edit-grants (opens the
- * builder drawer) and the Learn-progress count.
+ * grant exists. Shows compact grant chips, a Learn-progress count when
+ * any modules are complete, and Edit / Reset actions on the right.
  */
 export default function ToolStateStrip() {
-  const { profile, resetAll } = usePortal();
+  const {
+    profile,
+    completedModules,
+    resetAll,
+    openBuilder,
+  } = usePortal();
 
   if (profile.grants.length === 0) return null;
+
+  const completed = Object.keys(completedModules).length;
+  const total = modules.length;
 
   return (
     <div
@@ -47,23 +55,44 @@ export default function ToolStateStrip() {
           </li>
         ))}
       </ul>
-      <button
-        type="button"
-        onClick={() => {
-          if (
-            typeof window !== "undefined" &&
-            window.confirm(
-              "Reset everything? This clears your grants, chat history, and forgets your API key on this device.",
-            )
-          ) {
-            resetAll();
-          }
-        }}
-        className="text-xs underline underline-offset-4"
-        style={{ color: "var(--text-muted)" }}
-      >
-        Reset
-      </button>
+      <div className="flex items-center gap-4 text-xs">
+        {completed > 0 && (
+          <span
+            className="uppercase tracking-[0.18em]"
+            style={{ color: "var(--text-muted)" }}
+          >
+            <span className="mono" style={{ color: "var(--text-secondary)" }}>
+              {completed}/{total}
+            </span>{" "}
+            learn
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={openBuilder}
+          className="underline underline-offset-4"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          Edit grants
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (
+              typeof window !== "undefined" &&
+              window.confirm(
+                "Reset everything? This clears your grants, chat history, and forgets your API key on this device.",
+              )
+            ) {
+              resetAll();
+            }
+          }}
+          className="underline underline-offset-4"
+          style={{ color: "var(--text-muted)" }}
+        >
+          Reset
+        </button>
+      </div>
     </div>
   );
 }

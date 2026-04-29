@@ -4,6 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import TabNav from "@/components/tab/TabNav";
 import ToolStateStrip from "@/components/tab/ToolStateStrip";
+import GrantBuilder from "@/components/grants/GrantBuilder";
 import { PortalProvider } from "@/lib/state/PortalContext";
 import "./globals.css";
 
@@ -88,6 +89,7 @@ export default function RootLayout({
           <ToolStateStrip />
           <div className="flex-1">{children}</div>
           <SiteFooter />
+          <GrantBuilder />
         </PortalProvider>
       </body>
     </html>

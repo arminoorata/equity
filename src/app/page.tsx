@@ -1,5 +1,6 @@
 import { modules } from "@/data/modules";
 import PathSelector from "@/components/learn/PathSelector";
+import SetupGrantsButton from "@/components/grants/SetupGrantsButton";
 
 export const metadata = {
   title: { absolute: "Equity Education Portal" },
@@ -49,6 +50,15 @@ export default function LearnPage() {
             Free, no strings. I built this because it helped me and I hope
             it helps others.
           </p>
+        </div>
+        <div className="mt-6 flex flex-wrap items-center gap-4">
+          <SetupGrantsButton />
+          <span
+            className="text-xs"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Numbers stay on your device. Nothing is sent anywhere.
+          </span>
         </div>
       </section>
 
