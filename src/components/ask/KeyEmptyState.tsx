@@ -182,6 +182,34 @@ export default function KeyEmptyState() {
           with the request to Anthropic. Closing the tab clears it.
         </li>
       </ul>
+
+      <div
+        className="rounded-md border-l-4 p-4 text-sm"
+        style={{
+          borderColor: "var(--amber)",
+          background: "var(--surface)",
+          border: "1px solid var(--line)",
+          borderLeftColor: "var(--amber)",
+          borderLeftWidth: 4,
+          color: "var(--text-secondary)",
+        }}
+        role="note"
+      >
+        <p
+          className="text-[11px] font-semibold uppercase tracking-[0.18em]"
+          style={{ color: "var(--amber)" }}
+        >
+          Third-party AI notice
+        </p>
+        <p className="mt-2 leading-7">
+          Anthropic is a third-party AI provider. Some companies prohibit
+          sending plan documents, grant agreements, or compensation data
+          to outside AI services. Check your company&rsquo;s policy before
+          using the Ask tab with anything that could be confidential.
+          When in doubt, leave the upload empty and ask only generic
+          questions.
+        </p>
+      </div>
     </div>
   );
 }

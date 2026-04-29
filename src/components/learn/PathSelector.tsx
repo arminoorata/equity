@@ -51,9 +51,9 @@ export default function PathSelector({
         className="mt-3 text-base leading-7"
         style={{ color: "var(--muted)" }}
       >
-        Same six modules. The order shifts so the most relevant one for your
-        grant is up front. No tracking, no commitment. Change your mind any
-        time.
+        Same modules either way. The order shifts so the most relevant
+        one for your grant is up front. No tracking, no commitment.
+        Change your mind any time.
       </p>
 
       <ul

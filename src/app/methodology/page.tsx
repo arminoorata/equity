@@ -97,15 +97,12 @@ export default function MethodologyPage() {
           ]}
         />
 
+        <SourcesBlock />
+
         <Block
-          heading="Sources"
+          heading="On the plan-language interpretation"
           body={[
-            "IRS Publication 525 (Taxable and Nontaxable Income), most recent annual revision.",
-            "26 U.S.C. §422 (Incentive Stock Options) and the Treasury regulations under it.",
-            "26 U.S.C. §83 (Property Transferred in Connection With Performance of Services), including the §83(b) election rules.",
-            "26 U.S.C. §1202 (Partial Exclusion for Gain From Certain Small Business Stock), as amended through the One Big Beautiful Bill Act effective for stock acquired after July 4, 2025.",
-            "26 U.S.C. §55 to §59 and IRS Form 6251 for the Alternative Minimum Tax.",
-            "Plain-language interpretation of common equity plan terms (post-termination exercise windows, single vs double trigger, lock-up provisions) drawn from public plan documents and standard offer letters.",
+            "Plain-language interpretation of common equity plan terms (post-termination exercise windows, single vs double trigger, lock-up provisions, change-of-control acceleration) is drawn from public plan documents and standard offer letters. The educational framing is not a substitute for reading your own paperwork.",
           ]}
         />
 
@@ -158,6 +155,75 @@ function Block({
           </p>
         ))}
       </div>
+    </section>
+  );
+}
+
+const sourceLinks: Array<{ label: string; href: string }> = [
+  {
+    label: "IRS Publication 525, Taxable and Nontaxable Income",
+    href: "https://www.irs.gov/publications/p525",
+  },
+  {
+    label: "IRS Form 6251 instructions, Alternative Minimum Tax",
+    href: "https://www.irs.gov/instructions/i6251",
+  },
+  {
+    label: "26 U.S.C. §83, Property transferred in connection with services",
+    href: "https://www.law.cornell.edu/uscode/text/26/83",
+  },
+  {
+    label: "26 U.S.C. §422, Incentive stock options",
+    href: "https://www.law.cornell.edu/uscode/text/26/422",
+  },
+  {
+    label: "26 U.S.C. §1202, Partial exclusion for gain from QSBS",
+    href: "https://www.law.cornell.edu/uscode/text/26/1202",
+  },
+  {
+    label: "26 U.S.C. §55-§59, Alternative Minimum Tax",
+    href: "https://www.law.cornell.edu/uscode/text/26/55",
+  },
+  {
+    label: "Public Law 119-21 (One Big Beautiful Bill Act)",
+    href: "https://www.congress.gov/bill/119th-congress/house-bill/1/text",
+  },
+];
+
+function SourcesBlock() {
+  return (
+    <section>
+      <h2
+        className="text-lg font-semibold"
+        style={{ color: "var(--text)" }}
+      >
+        Sources
+      </h2>
+      <p
+        className="mt-3 text-[15px] leading-7"
+        style={{ color: "var(--text-secondary)" }}
+      >
+        Tax math and statutory citations come from the following primary
+        sources. Linked so the reader can verify directly.
+      </p>
+      <ul
+        className="mt-3 list-disc space-y-2 pl-5 text-[15px] leading-7"
+        style={{ color: "var(--text-secondary)" }}
+      >
+        {sourceLinks.map((s) => (
+          <li key={s.href}>
+            <a
+              href={s.href}
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-4"
+              style={{ color: "var(--accent)" }}
+            >
+              {s.label}
+            </a>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

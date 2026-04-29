@@ -184,6 +184,14 @@ function PlanDocUpload() {
         browser, attached to the next request, and never stored on a
         server.
       </p>
+      <p
+        className="mt-2 text-xs"
+        style={{ color: "var(--amber)" }}
+      >
+        Anthropic is a third-party AI provider. Some employers prohibit
+        sending plan documents to outside AI services. Check your
+        company&rsquo;s policy before uploading.
+      </p>
       <button
         type="button"
         onClick={() => inputRef.current?.click()}

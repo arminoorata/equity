@@ -65,10 +65,12 @@ export default function OfferCompare() {
         className="text-xs leading-6"
         style={{ color: "var(--text-muted)" }}
       >
-        Equity is the wildcard. The expected sale price below is your
-        guess, not the company&rsquo;s commitment. The dilution slider
-        approximates future raises shrinking your slice. Treat this as a
-        sanity check, not the answer.
+        Rough scenario estimate. The expected sale price is your guess,
+        not the company&rsquo;s commitment. The after-tax line for
+        options assumes long-term capital gains treatment, which only
+        applies if you exercise + hold for the qualifying periods.
+        Cashless exercise, leaving early, or holding NSOs all change the
+        picture. Treat this as a sanity check, not the answer.
       </p>
     </div>
   );
@@ -171,7 +173,7 @@ function OfferCard({
             className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
             style={{ background: "var(--accent-soft)", color: "var(--accent)" }}
           >
-            Highest net
+            Higher under these assumptions
           </span>
         )}
       </div>
@@ -242,7 +244,12 @@ function OfferCard({
           hint={`${state.dilutionPct}% haircut`}
         />
         <ResultRow label="Pre-tax total" value={fmt(result.pretax)} />
-        <ResultRow label="After-tax estimate" value={fmt(result.afterTax)} tone="good" />
+        <ResultRow
+          label="After-tax (rough estimate)"
+          value={fmt(result.afterTax)}
+          tone="good"
+          hint="options assumed LTCG-eligible; RSUs ordinary at vest"
+        />
       </div>
     </div>
   );

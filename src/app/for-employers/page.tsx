@@ -140,10 +140,10 @@ export default function ForEmployersPage() {
             <li>
               No app backend, no logged-in account, no client analytics
               tags. Vercel sees request-level traffic at the platform
-              layer, the same as for any static site. When the Ask tab
-              ships, it will use the reader&rsquo;s own Anthropic API
-              key to call Anthropic directly, with no key or
-              conversation routed through this site.
+              layer, the same as for any static site. The Ask tab uses
+              the reader&rsquo;s own Anthropic API key to call
+              Anthropic directly, with no key or conversation routed
+              through this site.
             </li>
             <li>
               No actual AMT owed. The calculators show AMT exposure
@@ -159,6 +159,25 @@ export default function ForEmployersPage() {
               payroll setup.
             </li>
           </ul>
+        </Block>
+
+        <Block heading="Third-party AI notice for the Ask tab">
+          <p>
+            The Ask tab calls Anthropic, a third-party AI provider, from
+            the reader&rsquo;s browser using their own API key. The tool
+            never sees the key or the conversation. Even so, plan
+            documents and grant data leave the reader&rsquo;s machine
+            and reach Anthropic when uploaded or quoted.
+          </p>
+          <p>
+            If your company prohibits sending compensation or
+            plan-document data to outside AI services, tell employees
+            to use the Ask tab with generic questions only and skip the
+            plan-document upload. The empty-state copy and the upload
+            UI both surface that warning. The educational tabs (Learn,
+            Vesting, Calculators, Exercise, Glossary) do not call
+            Anthropic and are unaffected.
+          </p>
         </Block>
 
         <Block heading="What it pairs well with">
