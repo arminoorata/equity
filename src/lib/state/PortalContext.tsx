@@ -39,6 +39,23 @@ export type Grant = {
 
 export type CompanyType = "private" | "public";
 
+export type ChatRole = "user" | "assistant";
+
+export type ChatMessage = {
+  role: ChatRole;
+  content: string;
+  id: string;
+};
+
+export type PlanDoc = {
+  type: "pdf" | "text";
+  name: string;
+  mimeType: string;
+  data: string;
+};
+
+export type ChatModel = "claude-haiku-4-5" | "claude-sonnet-4-6";
+
 export type Profile = {
   name?: string;
   experience?: "beginner" | "intermediate" | "advanced";
@@ -113,6 +130,19 @@ type PortalContextValue = {
   completedModules: Record<string, true>;
   markModuleComplete: (id: string) => void;
   unmarkModuleComplete: (id: string) => void;
+  // Ask tab state
+  apiKey: string;
+  setApiKey: (k: string) => void;
+  rememberKey: boolean;
+  setRememberKey: (b: boolean) => void;
+  chatModel: ChatModel;
+  setChatModel: (m: ChatModel) => void;
+  messages: ChatMessage[];
+  setMessages: (m: ChatMessage[]) => void;
+  appendMessage: (m: ChatMessage) => void;
+  clearMessages: () => void;
+  planDoc: PlanDoc | null;
+  setPlanDoc: (d: PlanDoc | null) => void;
   resetAll: () => void;
 };
 
@@ -126,17 +156,21 @@ export function PortalProvider({ children }: { children: ReactNode }) {
   const [rememberGrants, setRememberGrantsState] = useState(false);
   const [builderOpen, setBuilderOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [apiKey, setApiKeyState] = useState("");
+  const [rememberKey, setRememberKeyState] = useState(false);
+  const [chatModel, setChatModelState] = useState<ChatModel>("claude-haiku-4-5");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [planDoc, setPlanDoc] = useState<PlanDoc | null>(null);
 
-  // Hydrate from localStorage on mount if the remember toggle is on.
-  // The setState calls here are intentional and only fire once: they
-  // bridge persisted browser state into React state after SSR. They are
-  // gated by the `hydrated` flag below so the persistence effect does
-  // not clobber stored values on first paint.
+  // Hydrate from storage on mount. Loads grants when remember-grants
+  // is on, the API key from sessionStorage by default and localStorage
+  // when remember-key is on, and the saved model selection. setState
+  // here is intentional and only fires once.
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
-        const remember = window.localStorage.getItem(STORAGE_KEY_REMEMBER);
-        if (remember === "true") {
+        const rememberG = window.localStorage.getItem(STORAGE_KEY_REMEMBER);
+        if (rememberG === "true") {
           // eslint-disable-next-line react-hooks/set-state-in-effect
           setRememberGrantsState(true);
           const raw = window.localStorage.getItem(STORAGE_KEY_GRANTS);
@@ -147,6 +181,22 @@ export function PortalProvider({ children }: { children: ReactNode }) {
             }
           }
         }
+
+        const rememberK =
+          window.localStorage.getItem("remember_key") === "true";
+        if (rememberK) {
+          setRememberKeyState(true);
+          const k = window.localStorage.getItem("anthropic_key") ?? "";
+          if (k) setApiKeyState(k);
+        } else {
+          const k = window.sessionStorage.getItem("anthropic_key") ?? "";
+          if (k) setApiKeyState(k);
+        }
+
+        const savedModel = window.localStorage.getItem("chat_model");
+        if (savedModel === "claude-haiku-4-5" || savedModel === "claude-sonnet-4-6") {
+          setChatModelState(savedModel);
+        }
       } catch {
         // ignore parse / storage errors
       }
@@ -154,9 +204,9 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     setHydrated(true);
   }, []);
 
-  // Persist when remember is on. Gated on hydration so the first commit
-  // does not erase saved grants before the load effect can populate
-  // state.
+  // Persist grants when remember is on. Gated on hydration so the
+  // first commit does not erase saved grants before the load effect
+  // can populate state.
   useEffect(() => {
     if (!hydrated) return;
     if (typeof window === "undefined") return;
@@ -176,8 +226,68 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     }
   }, [profile, rememberGrants, hydrated]);
 
+  // Persist API key. Default storage is sessionStorage so the key
+  // is gone when the tab closes. Opting into rememberKey migrates
+  // it to localStorage.
+  useEffect(() => {
+    if (!hydrated) return;
+    if (typeof window === "undefined") return;
+    try {
+      if (apiKey) {
+        if (rememberKey) {
+          window.localStorage.setItem("anthropic_key", apiKey);
+          window.sessionStorage.removeItem("anthropic_key");
+        } else {
+          window.sessionStorage.setItem("anthropic_key", apiKey);
+          window.localStorage.removeItem("anthropic_key");
+        }
+      } else {
+        window.localStorage.removeItem("anthropic_key");
+        window.sessionStorage.removeItem("anthropic_key");
+      }
+      if (rememberKey) {
+        window.localStorage.setItem("remember_key", "true");
+      } else {
+        window.localStorage.removeItem("remember_key");
+      }
+    } catch {
+      // ignore
+    }
+  }, [apiKey, rememberKey, hydrated]);
+
+  // Persist chat-model selection. Cheap, no privacy implications.
+  useEffect(() => {
+    if (!hydrated) return;
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem("chat_model", chatModel);
+    } catch {
+      // ignore
+    }
+  }, [chatModel, hydrated]);
+
   const setRememberGrants = useCallback((b: boolean) => {
     setRememberGrantsState(b);
+  }, []);
+
+  const setApiKey = useCallback((k: string) => {
+    setApiKeyState(k);
+  }, []);
+
+  const setRememberKey = useCallback((b: boolean) => {
+    setRememberKeyState(b);
+  }, []);
+
+  const setChatModel = useCallback((m: ChatModel) => {
+    setChatModelState(m);
+  }, []);
+
+  const appendMessage = useCallback((m: ChatMessage) => {
+    setMessages((prev) => [...prev, m]);
+  }, []);
+
+  const clearMessages = useCallback(() => {
+    setMessages([]);
   }, []);
 
   const addGrant = useCallback((patch?: Partial<Grant>) => {
@@ -228,11 +338,17 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     setCompletedModules({});
     setRememberGrantsState(false);
     setBuilderOpen(false);
+    setApiKeyState("");
+    setRememberKeyState(false);
+    setMessages([]);
+    setPlanDoc(null);
+    setChatModelState("claude-haiku-4-5");
     if (typeof window === "undefined") return;
     try {
       sessionStorage.removeItem("anthropic_key");
       localStorage.removeItem("anthropic_key");
       localStorage.removeItem("remember_key");
+      localStorage.removeItem("chat_model");
       localStorage.removeItem(STORAGE_KEY_GRANTS);
       localStorage.removeItem(STORAGE_KEY_REMEMBER);
     } catch {
@@ -256,6 +372,18 @@ export function PortalProvider({ children }: { children: ReactNode }) {
       completedModules,
       markModuleComplete,
       unmarkModuleComplete,
+      apiKey,
+      setApiKey,
+      rememberKey,
+      setRememberKey,
+      chatModel,
+      setChatModel,
+      messages,
+      setMessages,
+      appendMessage,
+      clearMessages,
+      planDoc,
+      setPlanDoc,
       resetAll,
     }),
     [
@@ -272,6 +400,16 @@ export function PortalProvider({ children }: { children: ReactNode }) {
       completedModules,
       markModuleComplete,
       unmarkModuleComplete,
+      apiKey,
+      setApiKey,
+      rememberKey,
+      setRememberKey,
+      chatModel,
+      setChatModel,
+      messages,
+      appendMessage,
+      clearMessages,
+      planDoc,
       resetAll,
     ],
   );
