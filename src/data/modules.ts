@@ -13,6 +13,7 @@ export type Block =
       severity: "red" | "amber" | "green" | "info";
       title?: string;
       body: string;
+      notAdvice?: boolean;
     }
   | {
       type: "table";
@@ -115,7 +116,8 @@ export const modules: LearnModule[] = [
             type: "callout",
             severity: "red",
             title: "30-day deadline, no extensions",
-            body: "Miss the 30 days and you forfeit the favorable treatment forever. Same applies if you receive restricted stock subject to vesting. If 83(b) might apply to you, talk to a tax advisor immediately, not after the dust settles.",
+            body: "Miss the 30 days and you forfeit the favorable treatment forever. Same applies if you receive restricted stock subject to vesting.",
+            notAdvice: true,
           },
         ],
       },
@@ -165,7 +167,8 @@ export const modules: LearnModule[] = [
             type: "callout",
             severity: "red",
             title: "AMT is the single biggest ISO landmine",
-            body: "People have been bankrupted by AMT bills on shares they couldn't sell. Talk to a tax advisor before exercising any meaningful number of ISOs. Use the calculator below to see your spread, then call someone who actually does this for a living.",
+            body: "People have been bankrupted by AMT bills on shares they couldn't sell. Use the calculator below to see your spread, then call someone who actually does this for a living.",
+            notAdvice: true,
           },
           { type: "widget", widget: "amt-spread" },
         ],
@@ -247,6 +250,7 @@ export const modules: LearnModule[] = [
             severity: "amber",
             title: "The 83(b) tradeoff",
             body: "If you leave before the unvested shares vest, you lose them, and the tax you paid doesn't come back. Don't early-exercise more than you can afford to forfeit.",
+            notAdvice: true,
           },
         ],
       },
@@ -424,7 +428,8 @@ export const modules: LearnModule[] = [
             type: "callout",
             severity: "amber",
             title: "Real risk, real upside",
-            body: "If you leave before the shares vest, you lose them and you don't get the tax back. If the company grows substantially, all subsequent gain is at LTCG rates. Get a professional involved.",
+            body: "If you leave before the shares vest, you lose them and you don't get the tax back. If the company grows substantially, all subsequent gain is at LTCG rates.",
+            notAdvice: true,
           },
         ],
       },
@@ -610,6 +615,7 @@ export const modules: LearnModule[] = [
             severity: "amber",
             title: "Don't early-exercise more than you can afford to forfeit",
             body: "If the company succeeds and you stay, this is great. If you leave before the shares vest, you lose them, and the tax doesn't come back. The math has to work both ways.",
+            notAdvice: true,
           },
         ],
       },

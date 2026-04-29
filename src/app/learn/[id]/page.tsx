@@ -8,6 +8,7 @@ import Callout from "@/components/learn/blocks/Callout";
 import ComparisonTable from "@/components/learn/blocks/ComparisonTable";
 import WorkedExample from "@/components/learn/blocks/WorkedExample";
 import WidgetSlot from "@/components/learn/blocks/WidgetSlot";
+import Paragraph from "@/components/learn/blocks/Paragraph";
 
 type ModulePageProps = {
   params: Promise<{ id: string }>;
@@ -141,20 +142,14 @@ export default async function ModulePage({ params }: ModulePageProps) {
 function BlockView({ block }: { block: Block }) {
   switch (block.type) {
     case "paragraph":
-      return (
-        <p
-          className="text-[15px] leading-7"
-          style={{ color: "var(--text-secondary)" }}
-        >
-          {block.text}
-        </p>
-      );
+      return <Paragraph text={block.text} />;
     case "callout":
       return (
         <Callout
           severity={block.severity}
           title={block.title}
           body={block.body}
+          notAdvice={block.notAdvice}
         />
       );
     case "table":

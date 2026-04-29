@@ -42,10 +42,12 @@ export default function Callout({
   severity,
   title,
   body,
+  notAdvice,
 }: {
   severity: Severity;
   title?: string;
   body: string;
+  notAdvice?: boolean;
 }) {
   const t = tone[severity];
   const wrapStyle: CSSProperties = {
@@ -70,11 +72,20 @@ export default function Callout({
         {title ?? t.label}
       </p>
       <p
-        className="mt-2 text-[14.5px] leading-7"
+        className="mt-2 whitespace-pre-line text-[14.5px] leading-7"
         style={{ color: "var(--text)" }}
       >
         {body}
       </p>
+      {notAdvice && (
+        <p
+          className="mt-2 text-[11px] italic"
+          style={{ color: "var(--text-muted)" }}
+        >
+          Educational, not tax advice. Talk to a CPA before acting on
+          numbers like these.
+        </p>
+      )}
     </aside>
   );
 }
