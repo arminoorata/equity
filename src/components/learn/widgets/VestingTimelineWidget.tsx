@@ -60,7 +60,7 @@ export default function VestingTimelineWidget() {
             rx="1.5"
             fill="var(--surface)"
           />
-          {/* Vested portion (cliff + linear after) — for visualization the bar fills
+          {/* Vested portion (cliff + linear after). For visualization the bar fills
               fully through the timeline because the user is exploring the schedule shape,
               not "now." Cliff is highlighted as a separate region. */}
           <rect

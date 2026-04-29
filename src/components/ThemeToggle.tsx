@@ -39,7 +39,7 @@ export default function ThemeToggle() {
     try {
       localStorage.setItem("theme", next);
     } catch {
-      // localStorage might be blocked (private mode, etc.) — the toggle
+      // localStorage might be blocked (private mode, etc.). The toggle
       // still works for the current session; it just won't persist.
     }
   }

@@ -146,7 +146,7 @@ export const modules: LearnModule[] = [
         heading: "The tax shape",
         blocks: [
           p(
-            "At exercise: no regular income tax. (Yes, really.) At sale: if you held shares for more than 1 year past exercise AND more than 2 years past grant, the entire gain from strike to sale is taxed at long-term capital-gains rates. That's the qualifying disposition. Miss either holding period and you have a disqualifying disposition: the spread at exercise gets taxed as ordinary income retroactively.",
+            "At exercise: no regular income tax. (Yes, really.) At sale: if you held shares for more than 1 year past exercise AND more than 2 years past grant, the entire gain from strike to sale is taxed at long-term capital-gains rates. That's the qualifying disposition. Miss either holding period and you have a disqualifying disposition: any gain up to the spread at exercise gets taxed as ordinary income, with the rest (if any) treated as capital gain. If you sold at a loss, it's a capital loss and there is no ordinary income.",
           ),
           {
             type: "callout",
@@ -438,7 +438,7 @@ export const modules: LearnModule[] = [
         heading: "A note on QSBS",
         blocks: [
           p(
-            "If you hold qualified small business stock (Section 1202) for more than 5 years, you may exclude up to the greater of $10M or 10× your basis from federal capital gains tax. The rules are specific and easy to break.",
+            "If you hold qualified small business stock (Section 1202), you may exclude part of your federal capital gain at sale. The rules changed for stock acquired after July 4, 2025: 50% exclusion at 3 years, 75% at 4 years, 100% at 5 years, with a per-issuer cap of the greater of $15M (indexed) or 10x your basis. Stock acquired before that date keeps the older 100%-at-5-years and $10M cap shape. The eligibility rules (qualified small business, original-issue stock, gross-asset thresholds) are specific and easy to break.",
           ),
           {
             type: "callout",
@@ -574,7 +574,7 @@ export const modules: LearnModule[] = [
         heading: "The post-termination clock",
         blocks: [
           p(
-            "When you leave a company, your unvested options stop vesting that day. Your vested options usually have a fixed window after termination during which you can still exercise them. After that window, they expire and the shares are gone.",
+            "When you leave a company, your unvested options stop vesting that day. Your vested options usually have a fixed window after termination during which you can still exercise them. After that window the options expire, you lose the right to exercise, and you never own the underlying shares.",
           ),
           {
             type: "callout",

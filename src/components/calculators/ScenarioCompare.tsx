@@ -33,7 +33,9 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
     return <EmptyOption hasGrants={profile.grants.length > 0} />;
   }
 
-  // Scenario 1: exercise now, sell at event
+  // Scenario 1: exercise now, sell at event. Floor LTCG and ordinary
+  // tax at zero so a sale below strike registers as no tax (a capital
+  // loss is a separate model that this view does not surface).
   const s1Cash =
     shares * strike +
     (type === "nso" ? Math.max(0, (fmv - strike) * shares) * (tax / 100) : 0);
@@ -41,14 +43,14 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
     type === "iso" ? 0 : Math.max(0, (fmv - strike) * shares) * (tax / 100);
   const s1TaxLater =
     type === "iso"
-      ? (ipo - strike) * shares * (ltcg / 100)
+      ? Math.max(0, (ipo - strike) * shares) * (ltcg / 100)
       : Math.max(0, (ipo - fmv) * shares) * (ltcg / 100);
   const s1Amt = type === "iso" ? Math.max(0, (fmv - strike) * shares) : 0;
   const s1Net = shares * ipo - shares * strike - s1TaxNow - s1TaxLater;
 
   // Scenario 2: wait, cashless at event
   const s2Cash = 0;
-  const s2TaxLater = (ipo - strike) * shares * (tax / 100);
+  const s2TaxLater = Math.max(0, (ipo - strike) * shares) * (tax / 100);
   const s2Amt = 0;
   const s2Net = shares * ipo - shares * strike - s2TaxLater;
 
@@ -62,9 +64,9 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
     type === "iso" ? 0 : Math.max(0, (fmv - strike) * q) * (tax / 100);
   const s3TaxLater =
     (type === "iso"
-      ? (ipo - strike) * q * (ltcg / 100)
+      ? Math.max(0, (ipo - strike) * q) * (ltcg / 100)
       : Math.max(0, (ipo - fmv) * q) * (ltcg / 100)) +
-    (ipo - strike) * r * (tax / 100);
+    Math.max(0, (ipo - strike) * r) * (tax / 100);
   const s3Amt = type === "iso" ? Math.max(0, (fmv - strike) * q) : 0;
   const s3Net = shares * ipo - shares * strike - s3TaxNow - s3TaxLater;
 

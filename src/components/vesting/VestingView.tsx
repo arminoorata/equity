@@ -574,15 +574,39 @@ function Lifecycle({
     totalMonths > 0 ? Math.round((grant.cliffMonths / totalMonths) * 100) : 0;
   const sharesAtCliff = Math.round((grant.shares * cliffPct) / 100);
 
-  const valueAt = (price: number, sharesVested: number): number => {
+  // Private RSUs are double-trigger: shares deliver only when both
+  // time-vesting AND a liquidity event have happened. Value before
+  // the liquidity event is paper. We mark pre-event RSU stages as
+  // "deferred" so the lifecycle stops claiming a number that does
+  // not exist until settlement.
+  const isPrivateRsu = grant.type === "rsu" && companyType === "private";
+
+  const valueAt = (
+    price: number,
+    sharesVested: number,
+    deferred: boolean,
+  ): number | null => {
+    if (deferred) return null;
     if (grant.type === "rsu") return price * sharesVested;
     return Math.max(0, price - grant.strike) * sharesVested;
   };
 
-  const stages =
+  const stages: Array<{
+    id: string;
+    title: string;
+    price: number;
+    shares: number;
+    deferred: boolean;
+  }> =
     companyType === "private"
       ? [
-          { id: "grant", title: "Grant", price: fmv, shares: 0 },
+          {
+            id: "grant",
+            title: "Grant",
+            price: fmv,
+            shares: 0,
+            deferred: false,
+          },
           ...(grant.cliffMonths > 0
             ? [
                 {
@@ -590,6 +614,7 @@ function Lifecycle({
                   title: `Cliff (${cliffPct}%)`,
                   price: fmv,
                   shares: sharesAtCliff,
+                  deferred: isPrivateRsu,
                 },
               ]
             : []),
@@ -598,23 +623,38 @@ function Lifecycle({
             title: "Midpoint (50%)",
             price: fmv,
             shares: Math.round(grant.shares * 0.5),
+            deferred: isPrivateRsu,
           },
-          { id: "full", title: "Fully vested", price: fmv, shares: grant.shares },
+          {
+            id: "full",
+            title: "Fully vested",
+            price: fmv,
+            shares: grant.shares,
+            deferred: isPrivateRsu,
+          },
           {
             id: "event",
             title: "Liquidity event",
             price: eventPrice,
             shares: grant.shares,
+            deferred: false,
           },
           {
             id: "post",
             title: "Post lock-up",
             price: eventPrice,
             shares: grant.shares,
+            deferred: false,
           },
         ]
       : [
-          { id: "grant", title: "Grant", price: fmv, shares: 0 },
+          {
+            id: "grant",
+            title: "Grant",
+            price: fmv,
+            shares: 0,
+            deferred: false,
+          },
           ...(grant.cliffMonths > 0
             ? [
                 {
@@ -622,6 +662,7 @@ function Lifecycle({
                   title: `Cliff (${cliffPct}%)`,
                   price: fmv,
                   shares: sharesAtCliff,
+                  deferred: false,
                 },
               ]
             : []),
@@ -630,13 +671,21 @@ function Lifecycle({
             title: "Midpoint (50%)",
             price: fmv,
             shares: Math.round(grant.shares * 0.5),
+            deferred: false,
           },
-          { id: "full", title: "Fully vested", price: fmv, shares: grant.shares },
+          {
+            id: "full",
+            title: "Fully vested",
+            price: fmv,
+            shares: grant.shares,
+            deferred: false,
+          },
           {
             id: "sale",
             title: "Sale window",
             price: eventPrice,
             shares: grant.shares,
+            deferred: false,
           },
         ];
 
@@ -665,7 +714,7 @@ function Lifecycle({
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
         {stages.map((s) => {
-          const value = valueAt(s.price, s.shares);
+          const value = valueAt(s.price, s.shares, s.deferred);
           return (
             <div
               key={s.id}
@@ -682,16 +731,27 @@ function Lifecycle({
                 {s.title}
               </p>
               <p className="mono mt-2 text-2xl" style={{ color: "var(--text)" }}>
-                ${Math.round(value).toLocaleString()}
+                {value === null
+                  ? "Deferred"
+                  : `$${Math.round(value).toLocaleString()}`}
               </p>
               <p
                 className="mt-1 text-xs"
                 style={{ color: "var(--text-muted)" }}
               >
-                <span className="mono">{s.shares.toLocaleString()}</span>{" "}
-                {grant.type === "rsu" ? "RSUs" : "options"} ×{" "}
-                <span className="mono">${s.price}</span>
-                {grant.type !== "rsu" ? ` − $${grant.strike} strike` : ""}
+                {s.deferred ? (
+                  <span>
+                    Private RSUs need a liquidity event to settle. Until
+                    then, this stage is paper, not value.
+                  </span>
+                ) : (
+                  <>
+                    <span className="mono">{s.shares.toLocaleString()}</span>{" "}
+                    {grant.type === "rsu" ? "RSUs" : "options"} ×{" "}
+                    <span className="mono">${s.price}</span>
+                    {grant.type !== "rsu" ? ` − $${grant.strike} strike` : ""}
+                  </>
+                )}
               </p>
             </div>
           );
@@ -716,14 +776,32 @@ function Lifecycle({
             className="mono mt-2 text-2xl"
             style={{ color: "var(--text)" }}
           >
-            ${Math.round(valueAt(fmv, status.vestedNow)).toLocaleString()}
+            {(() => {
+              const todayValue = valueAt(fmv, status.vestedNow, isPrivateRsu);
+              return todayValue === null
+                ? "Deferred"
+                : `$${Math.round(todayValue).toLocaleString()}`;
+            })()}
           </p>
           <p
             className="mt-1 text-xs"
             style={{ color: "var(--text-muted)" }}
           >
-            <span className="mono">{status.vestedNow.toLocaleString()}</span>{" "}
-            vested at <span className="mono">${fmv}</span> FMV
+            {isPrivateRsu ? (
+              <span>
+                <span className="mono">
+                  {status.vestedNow.toLocaleString()}
+                </span>{" "}
+                time-vested. Settles only after a liquidity event.
+              </span>
+            ) : (
+              <>
+                <span className="mono">
+                  {status.vestedNow.toLocaleString()}
+                </span>{" "}
+                vested at <span className="mono">${fmv}</span> FMV
+              </>
+            )}
           </p>
         </div>
       )}

@@ -220,9 +220,10 @@ export default function PteCalculator() {
             className="mt-3 text-xs leading-5"
             style={{ color: "var(--text-muted)" }}
           >
-            This is a one-way door. After the window closes, the shares
-            are gone. Talk to a tax advisor before pulling the trigger
-            on a meaningful slice.
+            This is a one-way door. After the window closes, the
+            unexercised options expire and the chance to own the
+            underlying shares is gone with them. Talk to a tax advisor
+            before pulling the trigger on a meaningful slice.
           </p>
         </div>
       </div>

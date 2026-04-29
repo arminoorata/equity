@@ -28,8 +28,9 @@ export default function OptionsCalculator({ profile }: { profile: Profile }) {
   const spread = (fmv - strike) * shares;
   const total = shares * sale;
 
-  // ISO (qualifying disposition assumed)
-  const isoTaxAtSale = (sale - strike) * shares * (ltcg / 100);
+  // ISO (qualifying disposition assumed). Floor at zero: a sale below
+  // strike is a capital loss, not a positive tax bill.
+  const isoTaxAtSale = Math.max(0, (sale - strike) * shares) * (ltcg / 100);
   const isoNet = total - cost - isoTaxAtSale;
 
   // NSO

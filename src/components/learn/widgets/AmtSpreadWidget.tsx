@@ -8,7 +8,7 @@ import WidgetResult from "./WidgetResult";
 /**
  * AMT spread mini-calculator. Inputs: shares, strike, FMV. Output:
  * spread (= AMT exposure) and exercise cost. Doesn't try to compute
- * actual AMT owed — that depends on the user's full tax picture.
+ * actual AMT owed; that depends on the user's full tax picture.
  */
 export default function AmtSpreadWidget() {
   const [shares, setShares] = useState(1000);

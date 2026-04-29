@@ -123,9 +123,12 @@ function evaluate(
   const cashAfterTax = cashTotal * (1 - taxRate / 100);
   const equityAfterTax =
     o.equityType === "rsu"
-      ? // Half taxed at vest as ordinary, half held >1yr at LTCG. Crude.
-        equityAfterDilution * 0.5 * (1 - taxRate / 100) +
-        equityAfterDilution * 0.5 * (1 - ltcgRate / 100)
+      ? // RSUs: full FMV at vest is ordinary income. Subsequent
+        // appreciation past vest only matters if shares are held, and
+        // a 4-year horizon at offer time is too rough to model that
+        // here. Treat as fully ordinary so the comparison doesn't
+        // overstate after-tax value.
+        equityAfterDilution * (1 - taxRate / 100)
       : // Options: assume LTCG-eligible (qualified-disposition shape).
         equityAfterDilution * (1 - ltcgRate / 100);
   const pretax = cashTotal + equityAfterDilution;

@@ -254,7 +254,7 @@ function buildAdvice(a: Answers): AdviceCard[] {
     cards.push({
       title: "⭐ ISO specifics: AMT and the 1+2 rule",
       severity: "accent",
-      body: "ISOs are friendlier on the LTCG side if you hold 1+ year past exercise and 2+ years past grant. Miss either and the spread becomes ordinary income. AMT is a separate calculation that can owe even when regular tax does not.",
+      body: "ISOs are friendlier on the LTCG side if you hold 1+ year past exercise and 2+ years past grant. Miss either and any gain up to the exercise spread is taxed as ordinary income; gain above the spread stays capital, and a loss is a capital loss. AMT is a separate calculation that can owe even when regular tax does not.",
     });
   }
 

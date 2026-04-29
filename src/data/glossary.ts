@@ -54,7 +54,7 @@ const entries: Array<[string, string]> = [
   ],
   [
     "Disqualifying Disposition",
-    "Selling ISO shares before meeting both holding periods (1 year post-exercise + 2 years post-grant). The spread at exercise gets taxed as ordinary income.",
+    "Selling ISO shares before meeting both holding periods (1 year post-exercise + 2 years post-grant). If the sale produced a gain, ordinary income is the smaller of the spread at exercise or the realized gain, with anything above that treated as capital gain. A loss is a capital loss with no ordinary-income portion.",
   ],
   [
     "Double Trigger Vesting",
@@ -122,7 +122,7 @@ const entries: Array<[string, string]> = [
   ],
   [
     "QSBS (Qualified Small Business Stock)",
-    "US Section 1202 of the tax code. If you hold qualifying shares for more than 5 years, you may exclude up to the greater of $10M or 10x your basis from federal capital gains tax. Eligibility rules are specific.",
+    "US Section 1202 of the tax code. For shares acquired after July 4, 2025: 50% exclusion at 3-year hold, 75% at 4 years, 100% at 5 years, with a per-issuer cap of the greater of $15M (indexed) or 10x basis. Pre-July-2025 shares keep the older 100%-at-5-years rule with a $10M cap. Eligibility rules are specific.",
   ],
   [
     "Qualifying Disposition",

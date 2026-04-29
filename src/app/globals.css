@@ -8,7 +8,7 @@
   initial-value: 0deg;
 }
 
-/* ── Gilt palette — dual theme ──
+/* ── Gilt palette, dual theme ──
    Mirrored verbatim from arminoorata.com so the Equity Toolkit feels
    like a sibling surface, not a different brand. The toggle flips
    [data-theme] on <html>. */
@@ -39,7 +39,7 @@ html[data-theme="dark"] {
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
 
-  /* Status colors — semantic, dark-optimized. Used for vested/unvested
+  /* Status colors, semantic, dark-optimized. Used for vested/unvested
      state, time-sensitive risks, low-cost opportunities, skipped steps.
      Brand --accent is reserved for the eyebrow + primary CTA.
      Token values match the FLSA tool's base.css. */
@@ -416,7 +416,7 @@ html[data-theme="light"] .theme-icon-sun {
   }
 }
 
-/* Spotlight card — cursor-tracked radial glow on hover. */
+/* Spotlight card: cursor-tracked radial glow on hover. */
 .spotlight-card {
   --spotlight-x: 50%;
   --spotlight-y: 50%;

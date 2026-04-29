@@ -133,7 +133,7 @@ export const quizzes: Record<string, QuizQuestion[]> = {
           label: "1 year from exercise AND 2 years from grant",
           correct: true,
           explanation:
-            "Right. You need both. Miss either and the entire spread becomes ordinary income retroactively.",
+            "Right. You need both. Miss either and any gain up to the exercise spread becomes ordinary income; gain above the spread stays capital. A sale at a loss is just a capital loss, no ordinary-income piece.",
         },
         {
           label: "2 years from exercise + 1 year from grant",
@@ -405,7 +405,7 @@ export const quizzes: Record<string, QuizQuestion[]> = {
           label: "Anytime, with company permission",
           correct: false,
           explanation:
-            "It's not a permission system; it's a contractual lock-up that ends on a date.",
+            "Lock-up is a contractual restriction with a fixed end date. The company doesn't grant exceptions to insiders the way 'with permission' implies.",
         },
       ],
     },
@@ -496,7 +496,7 @@ export const quizzes: Record<string, QuizQuestion[]> = {
           label: "You get a refund of all the tax you paid at exercise",
           correct: false,
           explanation:
-            "That's the catch with early exercise. Taxes you paid on the unvested portion don't come back if you leave before vest.",
+            "Early exercise locks in your tax basis under 83(b), but taxes you paid on the unvested portion don't come back if you leave before those shares vest.",
         },
         {
           label:

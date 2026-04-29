@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   defaultGrant,
   usePortal,
@@ -37,23 +37,73 @@ export default function GrantBuilder() {
     }
   }, [builderOpen, profile, setProfile]);
 
-  // Lock background scroll while open.
+  // Lock background scroll, save the previously-focused element so we
+  // can restore focus on close, and inert the rest of the page so
+  // assistive tech does not see siblings of the dialog.
+  const drawerRef = useRef<HTMLElement | null>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (typeof document === "undefined") return;
     if (builderOpen) {
-      const prev = document.body.style.overflow;
+      previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
+      const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
-        document.body.style.overflow = prev;
+        document.body.style.overflow = prevOverflow;
+        if (previouslyFocusedRef.current && previouslyFocusedRef.current.focus) {
+          try {
+            previouslyFocusedRef.current.focus();
+          } catch {
+            // ignore focus-restore failures
+          }
+        }
       };
     }
   }, [builderOpen]);
 
-  // Close on Escape.
+  // Initial focus: move focus to the first focusable inside the drawer.
+  useEffect(() => {
+    if (!builderOpen) return;
+    const t = setTimeout(() => {
+      const drawer = drawerRef.current;
+      if (!drawer) return;
+      const first = drawer.querySelector<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      first?.focus();
+    }, 0);
+    return () => clearTimeout(t);
+  }, [builderOpen]);
+
+  // Close on Escape, and trap Tab inside the drawer while open.
   useEffect(() => {
     if (!builderOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeBuilder();
+      if (e.key === "Escape") {
+        closeBuilder();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const drawer = drawerRef.current;
+      if (!drawer) return;
+      const focusables = drawer.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      const enabled = Array.from(focusables).filter(
+        (el) => !el.hasAttribute("disabled") && el.offsetParent !== null,
+      );
+      if (enabled.length === 0) return;
+      const first = enabled[0];
+      const last = enabled[enabled.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -85,6 +135,7 @@ export default function GrantBuilder() {
         style={{ background: "rgba(0,0,0,0.55)" }}
       />
       <aside
+        ref={drawerRef}
         className="flex h-full w-full max-w-xl flex-col overflow-hidden border-l shadow-2xl"
         style={{
           borderColor: "var(--line)",
