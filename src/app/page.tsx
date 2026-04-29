@@ -1,5 +1,5 @@
 import { modules } from "@/data/modules";
-import LearnModuleGrid from "@/components/learn/LearnModuleGrid";
+import PathSelector from "@/components/learn/PathSelector";
 
 export const metadata = {
   title: { absolute: "Equity Education Portal" },
@@ -8,9 +8,10 @@ export const metadata = {
 };
 
 /**
- * Learn tab (`/`). Top: intro card in Armi's voice from spec/05-CONTENT.md.
- * Then the six-module grid (LearnModuleGrid is a client component because
- * it reads the completion state from PortalContext).
+ * Learn tab (`/`). Top: intro card in Armi's voice, three paragraphs
+ * verbatim from spec/05-CONTENT.md. Then the PathSelector, which
+ * shows the six modules in a grid that reorders when the user picks
+ * a grant type. The default order matches the canonical module list.
  */
 export default function LearnPage() {
   return (
@@ -51,28 +52,10 @@ export default function LearnPage() {
         </div>
       </section>
 
-      {/* Module grid */}
-      <section className="mt-12">
-        <p
-          className="text-xs font-medium uppercase tracking-[0.32em]"
-          style={{ color: "var(--text-muted)" }}
-        >
-          Modules ({modules.length})
-        </p>
-        <h2 className="mt-3 text-2xl font-medium tracking-tight md:text-3xl">
-          Start here.
-        </h2>
-        <p
-          className="mt-3 text-base leading-7"
-          style={{ color: "var(--muted)" }}
-        >
-          Six short modules. Pick what&rsquo;s relevant or work through them
-          in order. Each one is roughly five minutes.
-        </p>
-        <div className="mt-8">
-          <LearnModuleGrid modules={modules} />
-        </div>
-      </section>
+      {/* Path selector + module grid */}
+      <div className="mt-12">
+        <PathSelector modules={modules} />
+      </div>
     </main>
   );
 }
