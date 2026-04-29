@@ -42,6 +42,20 @@ export type LearnModule = {
   minutes: number;
   blurb: string;
   sections: ModuleSection[];
+  /**
+   * Yyyy-mm of the most recent factual review for this module's
+   * tax/regulatory content. Surfaced at the bottom of the module page
+   * so readers can see the content is current. Update whenever the
+   * underlying tax law changes (e.g. §1202, AMT thresholds).
+   */
+  lastReviewed?: string;
+  /**
+   * Per-module list of "Questions to ask your equity team or CPA".
+   * Renders as a closing card on the module page. Helps readers turn
+   * passive understanding into a concrete next step without the tool
+   * having to give advice.
+   */
+  questions?: string[];
 };
 
 const p = (text: string): Block => ({ type: "paragraph", text });
@@ -52,9 +66,16 @@ export const modules: LearnModule[] = [
     id: "basics",
     title: "Equity 101",
     icon: "🎓",
-    minutes: 5,
+    minutes: 6,
     blurb:
       "What equity actually is, why companies grant it, and what to read in your own grant.",
+    lastReviewed: "2026-04",
+    questions: [
+      "What kind of grants do I have, and where can I see them in writing?",
+      "What is my company's most recent 409A valuation, and when does it next refresh?",
+      "Where is the plan document, and how do I get a copy?",
+      "Is early exercise allowed under my plan, or only post-vesting?",
+    ],
     sections: [
       {
         id: "what-equity-is",
@@ -94,7 +115,7 @@ export const modules: LearnModule[] = [
         heading: "Vesting, briefly",
         blocks: [
           p(
-            "Vesting is how you actually earn the equity over time. Most grants vest over four years with a one-year cliff, but everything is negotiable and a lot of grants don't follow that pattern anymore.",
+            "Vesting is how you actually earn the equity over time. Most grants vest over four years with a one-year cliff. Other shapes exist too: shorter cliffs, monthly-from-day-one, longer total periods. The exact shape lives in your grant letter.",
           ),
           {
             type: "callout",
@@ -121,6 +142,58 @@ export const modules: LearnModule[] = [
           },
         ],
       },
+      {
+        id: "find-these-at-your-company",
+        heading: "Find these numbers at your company",
+        blocks: [
+          p(
+            "Almost every example in this tool uses generic defaults. Your numbers are specific to your company and your grant. Before you trust any output here, find these six things at your own company. The plan document and your grant letter cover most of them.",
+          ),
+          {
+            type: "table",
+            caption: "A small worksheet for your own grant. Plan documents differ; numbers below are common defaults.",
+            headers: ["What to find", "Where to look", "Common default"],
+            rows: [
+              [
+                "Post-termination exercise window",
+                "Plan document, sometimes the offer letter",
+                "90 days (some companies: 5 to 10 years)",
+              ],
+              [
+                "Whether early exercise is allowed",
+                "Grant letter or plan document",
+                "Often no",
+              ],
+              [
+                "Whether RSUs are double-trigger",
+                "Plan document. Almost always yes at private companies",
+                "Yes (private), No (public)",
+              ],
+              [
+                "How often the 409A is updated",
+                "Equity team or your equity platform (Carta, Pulley, Shareworks)",
+                "Annually, plus after material events",
+              ],
+              [
+                "Acceleration on change of control",
+                "Offer letter or grant letter",
+                "Usually none, sometimes double-trigger",
+              ],
+              [
+                "Where the plan document lives",
+                "Equity platform, HR portal, or your offer paperwork",
+                "Varies",
+              ],
+            ],
+          },
+          {
+            type: "callout",
+            severity: "info",
+            title: "Why this list matters",
+            body: "Equity is one of the most personalized parts of compensation. A tool that shows you the math is only as accurate as the inputs. Treat the calculators here as illustrations until you've verified the numbers above for your own company.",
+          },
+        ],
+      },
     ],
   },
   // ────────────────────────────────────────────────────────────────
@@ -131,6 +204,14 @@ export const modules: LearnModule[] = [
     minutes: 6,
     blurb:
       "Incentive stock options: friendlier tax if you play it right, AMT if you don't.",
+    lastReviewed: "2026-04",
+    questions: [
+      "What is my current spread (FMV at last 409A minus my strike), per share and in total?",
+      "If I exercised some or all of my vested ISOs this year, what would the AMT impact look like in my full tax picture?",
+      "Have I confirmed which of my options are ISOs vs NSOs (the $100K rule means many people have a mix)?",
+      "If I'm planning to leave, when does my post-termination exercise window close, and does that match the federal 3-month ISO rule?",
+      "Am I tracking my exercise dates so I can hit the 1-year-post-exercise / 2-year-post-grant qualifying thresholds?",
+    ],
     sections: [
       {
         id: "what-isos-are",
@@ -198,6 +279,13 @@ export const modules: LearnModule[] = [
     minutes: 5,
     blurb:
       "Non-qualified options: ordinary income at exercise, broader eligibility, no AMT.",
+    lastReviewed: "2026-04",
+    questions: [
+      "What's the spread at my current FMV, and what would the ordinary income tax look like if I exercised this year?",
+      "Does my company allow early exercise on NSOs, and if so, am I eligible to file an 83(b) within 30 days?",
+      "How does my company handle withholding at NSO exercise (payroll withholding vs same-day sale)?",
+      "Are any of my options classified as NSOs because they exceeded the $100K ISO limit, and does my plan document confirm that?",
+    ],
     sections: [
       {
         id: "what-nsos-are",
@@ -264,6 +352,13 @@ export const modules: LearnModule[] = [
     minutes: 5,
     blurb:
       "Restricted stock units: no cost to receive, ordinary income at settlement, single or double trigger.",
+    lastReviewed: "2026-04",
+    questions: [
+      "Are my RSUs single or double trigger, and where in the plan document is that confirmed?",
+      "What's the company's default withholding rate on RSU settlement, and can I supplement it with additional withholding if my marginal rate is higher?",
+      "If I've moved during the vesting period, has the company tracked the work-state allocation for tax purposes?",
+      "When are the next vest dates and what is the expected gross-income exposure each time?",
+    ],
     sections: [
       {
         id: "what-rsus-are",
@@ -358,6 +453,13 @@ export const modules: LearnModule[] = [
     minutes: 7,
     blurb:
       "Hypothetical numbers showing how the same grant can produce very different after-tax outcomes.",
+    lastReviewed: "2026-04",
+    questions: [
+      "If I exercised ISOs this year, would AMT actually trigger given my full tax picture?",
+      "Does my stock potentially qualify as QSBS under §1202, and which acquisition date applies (pre or post July 4, 2025)?",
+      "For any 83(b) election I'm considering, can my CPA help me file it within the 30-day window?",
+      "How should I think about state-level tax if I've moved during the vesting or holding period?",
+    ],
     sections: [
       {
         id: "why-this-matters",
@@ -438,7 +540,7 @@ export const modules: LearnModule[] = [
         heading: "A note on QSBS",
         blocks: [
           p(
-            "If you hold qualified small business stock (Section 1202), you may exclude part of your federal capital gain at sale. The rules changed for stock acquired after July 4, 2025: 50% exclusion at 3 years, 75% at 4 years, 100% at 5 years, with a per-issuer cap of the greater of $15M (indexed) or 10x your basis. Stock acquired before that date keeps the older 100%-at-5-years and $10M cap shape. The eligibility rules (qualified small business, original-issue stock, gross-asset thresholds) are specific and easy to break.",
+            "If you hold qualified small business stock (Section 1202), you may exclude part of your federal capital gain at sale. The rules depend on when you acquired the stock. Stock acquired after July 4, 2025: 50% exclusion at 3 years, 75% at 4 years, 100% at 5 years, with a per-issuer cap of the greater of $15M (indexed) or 10x your basis. Stock acquired after September 27, 2010 and on or before July 4, 2025: 100% exclusion at 5 years, $10M or 10x basis cap. Stock acquired on or before September 27, 2010 has lower exclusion percentages (50% or 75%) and triggers an AMT preference on the excluded portion. The eligibility rules (qualified small business, original-issue stock, gross-asset thresholds, active-business requirement) are specific and easy to break.",
           ),
           {
             type: "callout",
@@ -455,9 +557,16 @@ export const modules: LearnModule[] = [
     id: "liquidity",
     title: "Liquidity",
     icon: "💰",
-    minutes: 5,
+    minutes: 7,
     blurb:
       "Why private shares are hard to sell, what events change that, and how to plan around real selling windows.",
+    lastReviewed: "2026-04",
+    questions: [
+      "Does my offer letter or grant agreement include any acceleration on change of control, and is it single or double trigger?",
+      "Has my company done a tender offer before, and if so, what were the participation rules?",
+      "What is the typical lock-up length we should plan for in an IPO scenario?",
+      "If I might leave the company before a liquidity event, how does my exercise window interact with the planned event date?",
+    ],
     sections: [
       {
         id: "illiquidity-problem",
@@ -517,6 +626,51 @@ export const modules: LearnModule[] = [
         ],
       },
       {
+        id: "acceleration",
+        heading: "What happens to your equity in a change of control",
+        blocks: [
+          p(
+            "If your company gets acquired, merges, or goes through a change of control, your unvested equity does not always disappear and does not always vest. The terms are written in your offer letter or grant agreement, usually in a section labeled 'change in control' or 'acceleration.'",
+          ),
+          {
+            type: "table",
+            caption: "Common acceleration shapes. Yours might be a mix, might be silent, or might depend entirely on the deal terms.",
+            headers: ["Term", "What it means"],
+            rows: [
+              [
+                "No acceleration",
+                "No automatic vesting at the deal. The merger agreement decides what happens to your unvested equity: assumed by the buyer (you get buyer-equivalent equity on your existing schedule), substituted with new equity, cashed out subject to continued vesting, or cancelled. Read both your plan provisions and the merger agreement.",
+              ],
+              [
+                "Single trigger",
+                "Some or all of your unvested equity vests immediately at the change of control, regardless of your employment status.",
+              ],
+              [
+                "Double trigger",
+                "Some or all of your unvested equity vests if the change of control happens AND you're terminated without cause (or resign for good reason, if your plan defines it) within a defined window after.",
+              ],
+              [
+                "Full acceleration",
+                "100% of unvested equity accelerates under the trigger. Common for executives, rare for individual contributors.",
+              ],
+              [
+                "Partial acceleration",
+                "A defined percentage (commonly 25 to 50%) accelerates. Or all unvested shares that would have vested in the next 12 months.",
+              ],
+            ],
+          },
+          {
+            type: "callout",
+            severity: "info",
+            title: "How to read your paperwork",
+            body: "Search your offer letter, grant agreement, and plan document for 'change in control,' 'acceleration,' 'good reason,' and 'cause.' These four words are where the actual terms hide.",
+          },
+          p(
+            "What you have is what you have. The point of this section is to teach you what to look for, not to suggest you should have more or less of it.",
+          ),
+        ],
+      },
+      {
         id: "pre-liquidity-playbook",
         heading: "Pre-liquidity playbook",
         blocks: [
@@ -568,6 +722,13 @@ export const modules: LearnModule[] = [
     minutes: 5,
     blurb:
       "The 90-day clock, what happens to unvested shares, and the 83(b) caveat if you early-exercised.",
+    lastReviewed: "2026-04",
+    questions: [
+      "What is my exact post-termination exercise window, in days?",
+      "If I have ISOs, does my plan window line up with the federal 3-month ISO tax rule?",
+      "What is my current vested option count and current strike, and how much cash would a full exercise require?",
+      "What is my company's documented policy on post-termination exercise windows, and where is it written?",
+    ],
     sections: [
       {
         id: "the-clock",
@@ -586,7 +747,7 @@ export const modules: LearnModule[] = [
             type: "callout",
             severity: "amber",
             title: "ISOs have a separate 3-month rule",
-            body: "Federal tax law requires ISO exercise within 3 months of employment ending to keep ISO tax treatment. Past 90 days, the option may still be exercisable under your plan, but it gets taxed as an NSO (ordinary income on the spread at exercise). Two clocks: your plan window and the 3-month ISO clock. Often they line up. Sometimes they don't.",
+            body: "Federal tax law requires ISO exercise within 3 months of separation to keep ISO tax treatment. Past the 3-month mark, the option may still be exercisable under your plan, but it gets taxed as an NSO (ordinary income on the spread at exercise). The 3-month window extends to 12 months for permanent disability, and there is no time limit when the estate exercises after a holder's death. Two clocks: your plan window and the 3-month ISO tax clock. Often they line up. Sometimes they don't.",
           },
         ],
       },
@@ -655,9 +816,16 @@ export const modules: LearnModule[] = [
     id: "case-study",
     title: "Case study: Maya",
     icon: "📖",
-    minutes: 8,
+    minutes: 10,
     blurb:
-      "One person, grant date through IPO. The decisions that mattered, the ones that didn't, and what she'd do differently.",
+      "One person, grant date through IPO. The decisions that mattered, the ones that didn't, and what she'd do differently. Plus a counter-story when the company doesn't make it.",
+    lastReviewed: "2026-04",
+    questions: [
+      "If I were in Maya's year-2 position with my own numbers, what would my AMT exposure look like at a partial exercise I could afford?",
+      "Have I run my real grant through the calculators in this tool, not just Maya's hypothetical?",
+      "If my company doesn't succeed, would the cash I'd spend on early exercise be money I can lose without changing my life?",
+      "Do I have a CPA lined up for the year I might exercise, not the year I do exercise?",
+    ],
     sections: [
       {
         id: "intro",
@@ -772,6 +940,45 @@ export const modules: LearnModule[] = [
             severity: "green",
             title: "Patience past the lock-up paid off",
             body: "Selling at lock-up end would have been disqualifying. Two more months of waiting flipped the entire gain to LTCG treatment. The decision Maya made in year 6 was what made the year-7 patience worth something.",
+          },
+        ],
+      },
+      {
+        id: "the-other-side",
+        heading: "The other side: Sam's story",
+        blocks: [
+          p(
+            "Maya's path worked because the company succeeded. That isn't the only path. Sam joined the same company on the same day with the same grant. He read more about ISOs than Maya did, and after the cliff he exercised his 2,000 vested options at year 2, while the spread was tiny. Cost: $800 for the shares. The spread was $1,600, which counts toward AMT income but didn't trigger an actual AMT bill at his income. His long-term holding clock started.",
+          ),
+          {
+            type: "worked-example",
+            title: "Sam's exercise math at year 2",
+            lines: [
+              "Vested options: 2,000",
+              "Cost to exercise: 2,000 × $0.40 = $800",
+              "Spread: ($1.20 − $0.40) × 2,000 = $1,600",
+              "AMT exposure: $1,600 (no AMT triggered)",
+              "His long-term holding clock: started",
+            ],
+          },
+          p(
+            "Two years later the company missed two consecutive milestones, ran out of runway, and sold for less than the preference stack. Common stock, including Sam's exercised shares, paid out at zero.",
+          ),
+          {
+            type: "callout",
+            severity: "red",
+            title: "What Sam lost",
+            body: "The $800 he spent to exercise. None of it came back. The shares were worthless when the company sold. There is no AMT credit because no AMT was paid in the first place. Just $800 of cash gone, plus the time-value of money he had locked in those shares.",
+          },
+          p(
+            "Maya's company succeeded. Sam's didn't. Same grant, same decision shape, different outcomes.",
+          ),
+          {
+            type: "callout",
+            severity: "amber",
+            title: "The asymmetry of early exercise",
+            body: "Exercising early at a small spread reduces tax friction if the company succeeds. It also puts cash into an asset that can go to zero. Both things are true. People who can absorb the loss without changing their life have a different decision than people who can't. This is information, not a recommendation.",
+            notAdvice: true,
           },
         ],
       },

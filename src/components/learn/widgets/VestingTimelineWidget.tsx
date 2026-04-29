@@ -96,8 +96,8 @@ export default function VestingTimelineWidget() {
           style={{ color: "var(--text-muted)" }}
         >
           Default 4 years with a 1-year cliff. Try 0 cliff for the no-cliff
-          shape, or 6 months for a refresh-grant pattern. Everything is
-          negotiable.
+          shape, or 6 months for a refresh-grant pattern. Plenty of grants
+          use other shapes too.
         </p>
       </div>
     </WidgetFrame>

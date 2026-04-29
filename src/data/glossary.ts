@@ -42,7 +42,7 @@ const entries: Array<[string, string]> = [
   ],
   [
     "Cliff",
-    "A minimum service period before any of your equity vests. Commonly 12 months for new-hire grants, 6 months for refreshers, but everything is negotiable.",
+    "A minimum service period before any of your equity vests. Commonly 12 months for new-hire grants and 6 months for refreshers. Companies use other shapes too.",
   ],
   [
     "Common Stock",
@@ -122,7 +122,7 @@ const entries: Array<[string, string]> = [
   ],
   [
     "QSBS (Qualified Small Business Stock)",
-    "US Section 1202 of the tax code. For shares acquired after July 4, 2025: 50% exclusion at 3-year hold, 75% at 4 years, 100% at 5 years, with a per-issuer cap of the greater of $15M (indexed) or 10x basis. Pre-July-2025 shares keep the older 100%-at-5-years rule with a $10M cap. Eligibility rules are specific.",
+    "US Section 1202 of the tax code. For shares acquired after July 4, 2025: 50% exclusion at 3-year hold, 75% at 4 years, 100% at 5 years, with a per-issuer cap of the greater of $15M (indexed) or 10x basis. Shares acquired after September 27, 2010 and on or before July 4, 2025 keep the 100%-at-5-years rule with a $10M cap. Shares acquired on or before September 27, 2010 have lower exclusion percentages (50% or 75%) and trigger an AMT preference on the excluded portion. Eligibility rules are specific.",
   ],
   [
     "Qualifying Disposition",

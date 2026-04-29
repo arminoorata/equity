@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import QuestionsToAsk from "@/components/learn/blocks/QuestionsToAsk";
 
 /**
  * Five-step decision framework. Question text and option labels follow
@@ -316,6 +317,10 @@ function Results({
         ))}
       </div>
 
+      <div className="mt-8">
+        <QuestionsToAsk questions={frameworkQuestions(answers)} />
+      </div>
+
       <div className="mt-6 flex flex-wrap gap-3">
         <button
           type="button"
@@ -331,6 +336,35 @@ function Results({
       </div>
     </div>
   );
+}
+
+function frameworkQuestions(a: Answers): string[] {
+  const out: string[] = [
+    "Where in my plan document is my post-termination exercise window written, and what's the exact number of days?",
+    "What is my company's most recent 409A FMV, and when does it next refresh?",
+    "What does my CPA think AMT exposure looks like at the share count I'm considering, given my full tax picture?",
+  ];
+  if (a.situation === "leaving") {
+    out.push(
+      "What is my company's policy on post-termination exercise windows for departing employees, and is mine documented anywhere besides the plan document?",
+    );
+  }
+  if (a.situation === "event") {
+    out.push(
+      "What is the lock-up shape we should plan for, and are there blackout windows I need to map onto my calendar?",
+    );
+  }
+  if (a.type === "iso" || a.type === "both") {
+    out.push(
+      "Do my exercise dates and sale dates line up with the 1-year-post-exercise and 2-year-post-grant qualifying disposition rules?",
+    );
+  }
+  if (a.cash === "stretch" || a.cash === "difficult" || a.cash === "no") {
+    out.push(
+      "Is there a partial exercise number I can fund this tax year without changing my life if the company doesn't make it?",
+    );
+  }
+  return out;
 }
 
 function Card({ card }: { card: AdviceCard }) {

@@ -9,6 +9,7 @@ import ComparisonTable from "@/components/learn/blocks/ComparisonTable";
 import WorkedExample from "@/components/learn/blocks/WorkedExample";
 import WidgetSlot from "@/components/learn/blocks/WidgetSlot";
 import Paragraph from "@/components/learn/blocks/Paragraph";
+import QuestionsToAsk from "@/components/learn/blocks/QuestionsToAsk";
 
 type ModulePageProps = {
   params: Promise<{ id: string }>;
@@ -110,6 +111,10 @@ export default async function ModulePage({ params }: ModulePageProps) {
         <Quiz questions={quizFor(m.id)} />
       </div>
 
+      <div className="mt-10">
+        <QuestionsToAsk questions={m.questions} />
+      </div>
+
       <div className="mt-10 flex flex-wrap items-center gap-3">
         <ModuleCompletionButton moduleId={m.id} />
         {prev && (
@@ -124,8 +129,37 @@ export default async function ModulePage({ params }: ModulePageProps) {
         )}
       </div>
 
+      <div
+        className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t pt-4 text-[11px]"
+        style={{
+          borderColor: "var(--line)",
+          color: "var(--text-muted)",
+        }}
+      >
+        {m.lastReviewed && (
+          <span className="uppercase tracking-[0.18em]">
+            US-focused. Last reviewed{" "}
+            <span className="mono" style={{ color: "var(--text-secondary)" }}>
+              {formatReviewDate(m.lastReviewed)}
+            </span>
+          </span>
+        )}
+        <span>
+          Tax math follows IRS Pub 525, §422, §1202 and current AMT
+          rules. See sources in the{" "}
+          <Link
+            href="/methodology"
+            className="underline underline-offset-4"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            methodology note
+          </Link>
+          .
+        </span>
+      </div>
+
       <p
-        className="mt-12 rounded-md border px-4 py-3 text-xs italic leading-6"
+        className="mt-6 rounded-md border px-4 py-3 text-xs italic leading-6"
         style={{
           borderColor: "var(--amber-border)",
           background: "var(--amber-bg)",
@@ -137,6 +171,28 @@ export default async function ModulePage({ params }: ModulePageProps) {
       </p>
     </main>
   );
+}
+
+function formatReviewDate(yyyyMm: string): string {
+  const [y, m] = yyyyMm.split("-");
+  if (!y || !m) return yyyyMm;
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const monthIndex = Number(m) - 1;
+  const monthName = monthNames[monthIndex] ?? m;
+  return `${monthName} ${y}`;
 }
 
 function BlockView({ block }: { block: Block }) {
