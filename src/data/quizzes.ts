@@ -542,7 +542,3 @@ export const quizzes: Record<string, QuizQuestion[]> = {
     },
   ],
 };
-
-export function quizFor(moduleId: string): QuizQuestion[] {
-  return quizzes[moduleId] ?? [];
-}

@@ -38,6 +38,19 @@ export type ModuleSection = {
 export type LearnModule = {
   id: string;
   title: string;
+  /**
+   * Outcome-oriented label used on the Learn home tile. Different from
+   * `title` (which is the formal module name kept for SEO/metadata) so
+   * a tile can read "Avoid the ISO tax surprise" while the module page
+   * still says "ISOs".
+   */
+  cardTitle?: string;
+  /**
+   * One-line lead-in shown above the first step on the module page,
+   * tied to the user's likely first question. Replaces the old
+   * blurb-style intro paragraph.
+   */
+  hook?: string;
   icon: string;
   minutes: number;
   blurb: string;
@@ -65,6 +78,8 @@ export const modules: LearnModule[] = [
   {
     id: "basics",
     title: "Equity 101",
+    cardTitle: "Decode my grant",
+    hook: "What does this grant actually mean?",
     icon: "🎓",
     minutes: 6,
     blurb:
@@ -200,6 +215,8 @@ export const modules: LearnModule[] = [
   {
     id: "isos",
     title: "ISOs",
+    cardTitle: "Avoid the ISO tax surprise",
+    hook: "Could AMT surprise me?",
     icon: "⭐",
     minutes: 6,
     blurb:
@@ -275,6 +292,8 @@ export const modules: LearnModule[] = [
   {
     id: "nsos",
     title: "NSOs",
+    cardTitle: "Exercise without guessing",
+    hook: "What cash and tax happens when I exercise?",
     icon: "📋",
     minutes: 5,
     blurb:
@@ -348,6 +367,8 @@ export const modules: LearnModule[] = [
   {
     id: "rsus",
     title: "RSUs",
+    cardTitle: "See what you actually keep",
+    hook: "If 100 RSUs vest, how many do I keep?",
     icon: "🔒",
     minutes: 5,
     blurb:
@@ -449,6 +470,8 @@ export const modules: LearnModule[] = [
   {
     id: "tax",
     title: "Tax scenarios",
+    cardTitle: "Compare tax outcomes",
+    hook: "Same grant, different tax outcomes. See the shape.",
     icon: "🧮",
     minutes: 7,
     blurb:
@@ -556,6 +579,8 @@ export const modules: LearnModule[] = [
   {
     id: "liquidity",
     title: "Liquidity",
+    cardTitle: "Know when you can sell",
+    hook: "Vesting is not selling.",
     icon: "💰",
     minutes: 7,
     blurb:
@@ -718,6 +743,8 @@ export const modules: LearnModule[] = [
   {
     id: "leaving",
     title: "Leaving",
+    cardTitle: "Don't miss the clock",
+    hook: "When does my exercise window close?",
     icon: "🚪",
     minutes: 5,
     blurb:
@@ -815,6 +842,8 @@ export const modules: LearnModule[] = [
   {
     id: "case-study",
     title: "Case study: Maya",
+    cardTitle: "Choose Maya's next move",
+    hook: "Walk Maya's path. Pick a move; see what she did, and the math behind it.",
     icon: "📖",
     minutes: 10,
     blurb:

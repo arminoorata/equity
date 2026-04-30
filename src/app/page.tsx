@@ -9,10 +9,9 @@ export const metadata = {
 };
 
 /**
- * Learn tab (`/`). Top: intro card in Armi's voice, three paragraphs
- * verbatim from spec/05-CONTENT.md. Then the PathSelector, which
- * shows the six modules in a grid that reorders when the user picks
- * a grant type. The default order matches the canonical module list.
+ * Learn home (`/`). The intro is intentionally short — visitors scan,
+ * they don't read. One hook, one trust line, one primary CTA. The
+ * PathSelector below it is where the actual choosing happens.
  */
 export default function LearnPage() {
   return (
@@ -31,33 +30,20 @@ export default function LearnPage() {
         >
           Equity Education Portal
         </p>
-        <div
-          className="mt-4 space-y-4 text-base leading-7"
+        <h1
+          className="mt-4 text-2xl font-medium leading-snug tracking-tight md:text-[28px]"
           style={{ color: "var(--text)" }}
         >
-          <p>
-            Equity is one of the most important parts of compensation, and
-            one of the least understood. Most people get a grant letter, a
-            vesting schedule, and a hope for the best.
-          </p>
-          <p>
-            This is the version of that grant letter I wish I had the first
-            time I received an equity grant. Open the modules to learn the
-            basics, set up your grants to see your own numbers, or jump
-            straight to Ask if you have something specific.
-          </p>
-          <p>
-            Free, no strings. I built this because it helped me and I hope
-            it helps others.
-          </p>
-        </div>
+          Equity can expire, surprise you with taxes, or become real money.
+          Pick what you have and see the few decisions that matter.
+        </h1>
         <div className="mt-6 flex flex-wrap items-center gap-4">
-          <SetupGrantsButton />
+          <SetupGrantsButton labelOverride="Start with my grant" />
           <span
             className="text-xs"
             style={{ color: "var(--text-muted)" }}
           >
-            Numbers stay on your device. Nothing is sent anywhere.
+            Private by default. Numbers stay on your device.
           </span>
         </div>
       </section>

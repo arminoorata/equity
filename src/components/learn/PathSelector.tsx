@@ -38,22 +38,14 @@ export default function PathSelector({
 
   return (
     <section aria-label="Pick a starting point">
-      <p
-        className="text-xs font-medium uppercase tracking-[0.32em]"
-        style={{ color: "var(--text-muted)" }}
-      >
+      <h2 className="text-2xl font-medium tracking-tight md:text-3xl">
         What do you have?
-      </p>
-      <h2 className="mt-3 text-2xl font-medium tracking-tight md:text-3xl">
-        Pick what fits, or just start at the top.
       </h2>
       <p
-        className="mt-3 text-base leading-7"
-        style={{ color: "var(--muted)" }}
+        className="mt-2 text-[14.5px] leading-7"
+        style={{ color: "var(--text-muted)" }}
       >
-        Same modules either way. The order shifts so the most relevant
-        one for your grant is up front. No tracking, no commitment.
-        Change your mind any time.
+        Pick one. The path changes around your grant.
       </p>
 
       <ul

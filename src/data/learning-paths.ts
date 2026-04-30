@@ -21,10 +21,10 @@ export const learningPaths: Record<GrantType, string[]> = {
 };
 
 export const pathLeadIns: Record<GrantType, string> = {
-  iso: "Start with the basics, then ISOs, then how it shows up at tax time. The Leaving module covers the 90-day clock if you ever leave.",
-  nso: "Start with the basics, then NSOs, then how it shows up at tax time. The Leaving module covers the 90-day clock if you ever leave.",
-  rsu: "Start with the basics, then RSUs, then how it shows up at tax time. The Leaving module is short but worth reading once.",
-  mix: "If you have a mix, work through them in this order. The case study at the end pulls everything together.",
+  iso: "ISO path: AMT first, then the qualifying-disposition rules, then leaving.",
+  nso: "NSO path: ordinary income at exercise, then withholding, then leaving.",
+  rsu: "RSU path: withholding first, then single vs double trigger, then liquidity.",
+  mix: "Mixed path: basics, then each grant type, then how it lands at tax time.",
   unsure:
-    "Start at the top. If you don't know what you have, the first module covers the basics. The case study at the end shows how the pieces fit together.",
+    "Default path: basics first, then each grant type. The case study shows how the pieces fit together.",
 };

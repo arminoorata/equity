@@ -1,15 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getModule, modules, type Block } from "@/data/modules";
-import { quizFor } from "@/data/quizzes";
-import ModuleCompletionButton from "@/components/learn/ModuleCompletionButton";
-import Quiz from "@/components/learn/Quiz";
-import Callout from "@/components/learn/blocks/Callout";
-import ComparisonTable from "@/components/learn/blocks/ComparisonTable";
-import WorkedExample from "@/components/learn/blocks/WorkedExample";
-import WidgetSlot from "@/components/learn/blocks/WidgetSlot";
-import Paragraph from "@/components/learn/blocks/Paragraph";
-import QuestionsToAsk from "@/components/learn/blocks/QuestionsToAsk";
+import { getModule, modules } from "@/data/modules";
+import { stepsFor } from "@/data/module-steps";
+import ModuleExperience from "@/components/learn/ModuleExperience";
 
 type ModulePageProps = {
   params: Promise<{ id: string }>;
@@ -33,22 +26,45 @@ export async function generateMetadata({ params }: ModulePageProps) {
 }
 
 /**
- * Module detail page at /learn/[id]. Server-rendered and statically
- * generated. The "Mark complete" toggle lives in a small client
- * component that talks to PortalContext.
- *
- * Each section gets a stable anchor id so individual concepts are
- * deep-linkable (e.g. /learn/isos#amt-trap). Section headings render
- * as clickable anchors.
+ * Module detail page at /learn/[id]. Server-rendered for SEO
+ * (metadata uses the canonical title + blurb), with the actual
+ * step-based learning experience handed off to a client component
+ * so progress, disclosures, and decision reveals stay interactive.
  */
 export default async function ModulePage({ params }: ModulePageProps) {
   const { id } = await params;
   const m = getModule(id);
   if (!m) notFound();
 
+  const steps = stepsFor(m.id);
   const idx = modules.findIndex((x) => x.id === m.id);
   const prev = idx > 0 ? modules[idx - 1] : null;
   const next = idx < modules.length - 1 ? modules[idx + 1] : null;
+
+  // If a module has no steps yet for any reason, fall back to a stub
+  // rather than crashing the build.
+  if (steps.length === 0) {
+    return (
+      <main className="mx-auto max-w-3xl px-6 py-12 md:px-10 md:py-16">
+        <Link
+          href="/"
+          className="text-[12px] underline-offset-4 hover:underline"
+          style={{ color: "var(--text-muted)" }}
+        >
+          ← All modules
+        </Link>
+        <h1 className="mt-8 text-3xl font-medium tracking-tight">
+          {m.title}
+        </h1>
+        <p
+          className="mt-3 text-[14.5px] leading-7"
+          style={{ color: "var(--text-muted)" }}
+        >
+          This module doesn&apos;t have step content yet.
+        </p>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12 md:px-10 md:py-16">
@@ -69,64 +85,40 @@ export default async function ModulePage({ params }: ModulePageProps) {
         </p>
         <h1 className="mt-3 flex items-center gap-3 text-3xl font-medium leading-tight tracking-tight md:text-4xl">
           <span aria-hidden>{m.icon}</span>
-          <span>{m.title}</span>
+          <span>{m.cardTitle ?? m.title}</span>
         </h1>
+        {m.hook && (
+          <p
+            className="mt-3 text-[15px] leading-7"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            {m.hook}
+          </p>
+        )}
         <p
-          className="mt-2 text-[12px] uppercase tracking-[0.18em]"
+          className="mt-3 text-[12px] uppercase tracking-[0.18em]"
           style={{ color: "var(--text-muted)" }}
         >
-          <span className="mono">{m.minutes}</span> min read
+          <span className="mono">{m.minutes}</span> min ·{" "}
+          <span className="mono">{steps.length}</span> steps
         </p>
       </header>
 
-      <div className="mt-10 space-y-10">
-        {m.sections.map((section) => (
-          <section
-            key={section.id}
-            id={section.id}
-            className="scroll-mt-24"
-          >
-            <h2
-              className="text-lg font-semibold"
-              style={{ color: "var(--text)" }}
-            >
-              <a
-                href={`#${section.id}`}
-                className="hover:underline underline-offset-4"
-                style={{ color: "inherit" }}
-              >
-                {section.heading}
-              </a>
-            </h2>
-            <div className="mt-3 space-y-4">
-              {section.blocks.map((block, i) => (
-                <BlockView key={i} block={block} />
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
-
-      <div className="mt-12">
-        <Quiz questions={quizFor(m.id)} />
-      </div>
-
       <div className="mt-10">
-        <QuestionsToAsk questions={m.questions} />
-      </div>
-
-      <div className="mt-10 flex flex-wrap items-center gap-3">
-        <ModuleCompletionButton moduleId={m.id} />
-        {prev && (
-          <Link href={`/learn/${prev.id}`} className="btn">
-            ← {prev.title}
-          </Link>
-        )}
-        {next && (
-          <Link href={`/learn/${next.id}`} className="btn">
-            {next.title} →
-          </Link>
-        )}
+        <ModuleExperience
+          module={m}
+          steps={steps}
+          prev={
+            prev
+              ? { id: prev.id, title: prev.title, cardTitle: prev.cardTitle }
+              : null
+          }
+          next={
+            next
+              ? { id: next.id, title: next.title, cardTitle: next.cardTitle }
+              : null
+          }
+        />
       </div>
 
       <div
@@ -145,8 +137,8 @@ export default async function ModulePage({ params }: ModulePageProps) {
           </span>
         )}
         <span>
-          Tax math follows IRS Pub 525, §422, §1202 and current AMT
-          rules. See sources in the{" "}
+          Tax math follows IRS Pub 525, §422, §1202 and current AMT rules.
+          See sources in the{" "}
           <Link
             href="/methodology"
             className="underline underline-offset-4"
@@ -193,38 +185,4 @@ function formatReviewDate(yyyyMm: string): string {
   const monthIndex = Number(m) - 1;
   const monthName = monthNames[monthIndex] ?? m;
   return `${monthName} ${y}`;
-}
-
-function BlockView({ block }: { block: Block }) {
-  switch (block.type) {
-    case "paragraph":
-      return <Paragraph text={block.text} />;
-    case "callout":
-      return (
-        <Callout
-          severity={block.severity}
-          title={block.title}
-          body={block.body}
-          notAdvice={block.notAdvice}
-        />
-      );
-    case "table":
-      return (
-        <ComparisonTable
-          caption={block.caption}
-          headers={block.headers}
-          rows={block.rows}
-        />
-      );
-    case "worked-example":
-      return (
-        <WorkedExample
-          title={block.title}
-          lines={block.lines}
-          footnote={block.footnote}
-        />
-      );
-    case "widget":
-      return <WidgetSlot widget={block.widget} />;
-  }
 }

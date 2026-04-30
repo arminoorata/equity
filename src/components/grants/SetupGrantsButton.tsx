@@ -9,13 +9,22 @@ import { usePortal } from "@/lib/state/PortalContext";
 export default function SetupGrantsButton({
   variant = "primary",
   className = "",
+  labelOverride,
+  labelOverrideExisting,
 }: {
   variant?: "primary" | "ghost";
   className?: string;
+  /** Use this label when the user has not set up any grants yet. */
+  labelOverride?: string;
+  /** Use this label when the user already has grants set up. Falls back to labelOverride or the default "Edit your grants". */
+  labelOverrideExisting?: string;
 }) {
   const { openBuilder, profile } = usePortal();
   const hasGrants = profile.grants.length > 0;
-  const label = hasGrants ? "Edit your grants" : "Set up your grants";
+  const defaultLabel = hasGrants ? "Edit your grants" : "Set up your grants";
+  const label = hasGrants
+    ? labelOverrideExisting ?? labelOverride ?? defaultLabel
+    : labelOverride ?? defaultLabel;
 
   if (variant === "ghost") {
     return (
