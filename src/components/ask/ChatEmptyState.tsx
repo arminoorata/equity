@@ -160,6 +160,8 @@ function PlanDocUpload() {
           style={{ color: "var(--text-muted)" }}
         >
           The AI references this document. In-session only, never stored.
+          Verify any document-specific claims against your original paperwork
+          before acting on them.
         </p>
       </div>
     );
