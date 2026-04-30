@@ -317,8 +317,9 @@ function SettingsPanel() {
           className="mt-1 text-[11px] leading-5"
           style={{ color: "var(--text-muted)" }}
         >
-          {GEMINI_MODEL_NOTE} Free tier. Daily and per-minute limits
-          apply.
+          {GEMINI_MODEL_NOTE} Google offers a free tier with rate
+          limits; paid billing is only needed for higher limits or
+          paid-tier privacy.
         </p>
       </div>
 

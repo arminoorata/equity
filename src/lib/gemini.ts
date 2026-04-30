@@ -6,13 +6,15 @@ import type { ChatMessage, Grant, PlanDoc } from "@/lib/state/PortalContext";
  * generativelanguage.googleapis.com directly with the key passed as
  * the x-goog-api-key header.
  *
- * Model anchor: gemini-flash-latest. Google maintains this alias to
- * auto-route to the current stable Flash family model so a public BYOK
- * tool doesn't have to chase deprecation dates. The 2.x specific names
+ * Model anchor: gemini-flash-latest. This is the Google-published
+ * "latest Flash alias" — Google may route it to a stable, preview, or
+ * experimental Flash release at their discretion, and may swap the
+ * underlying model without notice. Pinning to the alias buys a public
+ * BYOK tool out of the deprecation chase, with the explicit tradeoff
+ * that exact model behavior can shift. The 2.x specific names
  * (gemini-2.5-flash, gemini-2.5-pro) are on Google's deprecation
- * calendar with a June 17 2026 shutdown, so they should NOT be the
- * pinned model. If Google ever retires the alias itself, swap to the
- * fallback constant and update the test guard.
+ * calendar with a June 17 2026 shutdown, so they must NOT be the
+ * pinned model.
  *
  * The key, the chat history, and any uploaded plan document never
  * touch a server we operate.
@@ -20,16 +22,11 @@ import type { ChatMessage, Grant, PlanDoc } from "@/lib/state/PortalContext";
 
 export const GEMINI_MODEL = "gemini-flash-latest";
 
-// Fallback if the -latest alias is unavailable on the user's project.
-// Kept as a named constant so callers can switch with one edit and
-// the test suite knows what to enforce.
-export const GEMINI_FALLBACK_MODEL = "gemini-pro-latest";
-
 // Human-readable label for the model card. The free Gemini lineup
 // shifts frequently, so the UI shows the alias plus a "may change"
 // note rather than promising specific behavior.
 export const GEMINI_MODEL_NOTE =
-  "Google routes this to the current stable Gemini Flash model. The underlying model may change as Google updates their lineup.";
+  "Latest Flash alias. Google may route this to newer Flash releases (stable, preview, or experimental) at their discretion, so exact model behavior can change.";
 
 const SYSTEM_PROMPT_BASE = `You are an equity compensation educator for a free public web tool built by Armi Noorata. Your readers are people trying to understand their own stock options, RSUs, or other equity grants. Some are getting their first grant. Some have been vesting for years. Treat them like adults who can handle real information without being condescended to.
 

@@ -47,9 +47,11 @@ export default function KeyEmptyState() {
           style={{ color: "var(--text-secondary)" }}
         >
           The Ask tab calls Google&rsquo;s Gemini API directly from your
-          browser using a key you mint at Google AI Studio. Free tier,
-          no credit card. The key stays on your device. There is no
-          backend, no logged account, and no chat log on my side.
+          browser using a key you mint at Google AI Studio. Google
+          offers a free tier with rate limits; paid billing is only
+          needed for higher limits or paid-tier privacy. The key stays
+          on your device. There is no backend, no logged account, and
+          no chat log on my side.
         </p>
 
         <label
@@ -158,10 +160,11 @@ export default function KeyEmptyState() {
               starts with <span className="mono">AIza</span>.
             </li>
             <li>
-              Paste it into the field above. The free tier on the
-              latest stable Gemini model doesn&rsquo;t ask for a credit
-              card. You will hit daily and per-minute caps if you chat
-              heavily; that&rsquo;s normal on free.
+              Paste it into the field above. Google&rsquo;s free tier
+              works without billing setup but enforces per-minute and
+              daily request limits. Paid billing is only needed if you
+              want higher limits or the paid-tier privacy posture
+              (Google does not train on paid-tier prompts).
             </li>
           </ol>
         </details>

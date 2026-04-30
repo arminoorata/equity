@@ -3,7 +3,8 @@ import {
   amtExposure,
   exerciseNowSellAtEvent,
   exercise25NowRestAtEvent,
-  isoDisqualifying,
+  isoDisqualifyingCashless,
+  isoDisqualifyingHeld,
   isoQualifying,
   nsoExerciseAndSell,
   offerOutcome,
@@ -128,9 +129,9 @@ describe("isoQualifying — table-driven", () => {
   });
 });
 
-describe("isoDisqualifying / same-year sale", () => {
-  it("treats spread up to FMV as ordinary, gain past FMV as LTCG, AMT clears", () => {
-    const out = isoDisqualifying({
+describe("isoDisqualifyingCashless — same-day / same-year sale", () => {
+  it("entire (sale - strike) is ordinary; no LTCG bifurcation; AMT clears", () => {
+    const out = isoDisqualifyingCashless({
       shares: 1000,
       strike: 2,
       fmv: 10,
@@ -139,18 +140,61 @@ describe("isoDisqualifying / same-year sale", () => {
       ltcgRate: 15,
     });
     expect(out.amtExposure).toBe(0);
-    // ordinary on the bargain element (FMV - strike) since sale > FMV
+    expect(close(out.taxAtExercise, (50 - 2) * 1000 * 0.35)).toBe(true);
+    expect(out.taxAtSale).toBe(0);
+    const expectedNet = 50 * 1000 - 2 * 1000 - (50 - 2) * 1000 * 0.35;
+    expect(close(out.net, expectedNet)).toBe(true);
+  });
+
+  it("ltcgRate has no effect on cashless: doubling it changes nothing", () => {
+    const inputs = {
+      shares: 1000,
+      strike: 2,
+      fmv: 10,
+      sale: 50,
+      ordinaryRate: 35,
+      ltcgRate: 15,
+    };
+    const a = isoDisqualifyingCashless(inputs);
+    const b = isoDisqualifyingCashless({ ...inputs, ltcgRate: 30 });
+    expect(a.net).toBe(b.net);
+    expect(a.taxAtSale).toBe(b.taxAtSale);
+  });
+
+  it("sale below strike: zero tax", () => {
+    const out = isoDisqualifyingCashless({
+      shares: 1000,
+      strike: 5,
+      fmv: 4,
+      sale: 3,
+      ordinaryRate: 35,
+      ltcgRate: 15,
+    });
+    expect(out.taxAtExercise).toBe(0);
+    expect(out.taxAtSale).toBe(0);
+  });
+});
+
+describe("isoDisqualifyingHeld — held >1yr past exercise, <2yr past grant", () => {
+  it("bargain element ordinary, post-FMV gain LTCG, AMT clears", () => {
+    const out = isoDisqualifyingHeld({
+      shares: 1000,
+      strike: 2,
+      fmv: 10,
+      sale: 50,
+      ordinaryRate: 35,
+      ltcgRate: 15,
+    });
+    expect(out.amtExposure).toBe(0);
     expect(close(out.taxAtExercise, (10 - 2) * 1000 * 0.35)).toBe(true);
-    // LTCG on the post-exercise gain
     expect(close(out.taxAtSale, (50 - 10) * 1000 * 0.15)).toBe(true);
-    // net = total - cost - ordinary - ltcg
     const expectedNet =
       50 * 1000 - 2 * 1000 - (10 - 2) * 1000 * 0.35 - (50 - 10) * 1000 * 0.15;
     expect(close(out.net, expectedNet)).toBe(true);
   });
 
-  it("sale below FMV: ordinary on (sale - strike), no LTCG", () => {
-    const out = isoDisqualifying({
+  it("sale below FMV: bargain element capped at gain, no LTCG", () => {
+    const out = isoDisqualifyingHeld({
       shares: 1000,
       strike: 2,
       fmv: 10,
@@ -163,17 +207,19 @@ describe("isoDisqualifying / same-year sale", () => {
     expect(out.taxAtSale).toBe(0);
   });
 
-  it("underwater: zero tax both lines", () => {
-    const out = isoDisqualifying({
+  it("held variant beats cashless variant when sale exceeds FMV (LTCG advantage)", () => {
+    const inputs = {
       shares: 1000,
-      strike: 5,
-      fmv: 4,
-      sale: 3,
+      strike: 2,
+      fmv: 10,
+      sale: 50,
       ordinaryRate: 35,
       ltcgRate: 15,
-    });
-    expect(out.taxAtExercise).toBe(0);
-    expect(out.taxAtSale).toBe(0);
+    };
+    const cashless = isoDisqualifyingCashless(inputs);
+    const held = isoDisqualifyingHeld(inputs);
+    // Held path uses LTCG on the post-FMV gain, cashless uses ordinary.
+    expect(held.net).toBeGreaterThan(cashless.net);
   });
 });
 
@@ -436,7 +482,7 @@ describe("ScenarioCompare ranking", () => {
     expect(close(flat.s1.net, flat.s2.net)).toBe(true);
   });
 
-  it("Ranking is deterministic on ties (first-match wins)", () => {
+  it("Three-way tie: highest is null and all three are listed as top", () => {
     // Construct a case where all three nets are equal: ordinary == LTCG
     // and FMV == strike removes both the spread and the post-exercise
     // gain from the picture.
@@ -451,7 +497,43 @@ describe("ScenarioCompare ranking", () => {
     });
     expect(close(flat.s1.net, flat.s2.net)).toBe(true);
     expect(close(flat.s2.net, flat.s3.net)).toBe(true);
-    expect(flat.highest).toBe(1);
+    expect(flat.highest).toBeNull();
+    expect(flat.topScenarios).toEqual([1, 2, 3]);
+  });
+
+  it("Two-way tie: highest is null and the two tied scenarios are listed", () => {
+    // ordinaryRate === ltcgRate makes scenarios 1 and 2 net the same
+    // for ISO, while scenario 3 differs because of the 25/75 split.
+    // Pick numbers so s3.net actually diverges by more than $1.
+    const flat = rankScenarios({
+      type: "iso",
+      shares: 1000,
+      strike: 2,
+      fmv: 50,
+      eventPrice: 50,
+      ordinaryRate: 20,
+      ltcgRate: 20,
+    });
+    // Sanity: s1 and s2 should be tied.
+    expect(close(flat.s1.net, flat.s2.net)).toBe(true);
+    expect(flat.highest).toBeNull();
+    expect(flat.topScenarios).toContain(1);
+    expect(flat.topScenarios).toContain(2);
+  });
+
+  it("Unique winner: highest is set and topScenarios has length 1", () => {
+    const r = rankScenarios({
+      type: "iso",
+      shares: 1000,
+      strike: 2,
+      fmv: 10,
+      eventPrice: 50,
+      ordinaryRate: 35,
+      ltcgRate: 15,
+    });
+    expect(r.highest).not.toBeNull();
+    expect(r.topScenarios).toHaveLength(1);
+    expect(r.topScenarios[0]).toBe(r.highest);
   });
 
   it("NSO scenario 1 pays ordinary tax up front and LTCG on appreciation", () => {

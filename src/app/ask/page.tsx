@@ -26,9 +26,10 @@ export default function AskPage() {
       >
         Educational chat about ISOs, NSOs, RSUs, AMT, lock-ups, tender
         offers, and the rest of equity comp. Bring your own Google AI
-        Studio key (free tier, no credit card). Your key, your
-        conversation, and any plan document you upload stay in your
-        browser and travel only to Google.
+        Studio key. Google offers a free tier with rate limits; paid
+        billing is only needed for higher limits or paid-tier privacy.
+        Your key, your conversation, and any plan document you upload
+        stay in your browser and travel only to Google.
       </p>
       <div className="mt-10">
         <AskView />

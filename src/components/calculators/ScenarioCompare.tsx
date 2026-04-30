@@ -44,7 +44,13 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
     ordinaryRate: tax,
     ltcgRate: ltcg,
   });
-  const { s1, s2, s3, highest } = ranking;
+  const { s1, s2, s3, highest, topScenarios } = ranking;
+  const tied = highest === null;
+  const badgeFor = (n: 1 | 2 | 3): "higher" | "tied" | "none" => {
+    if (highest === n) return "higher";
+    if (tied && topScenarios.includes(n)) return "tied";
+    return "none";
+  };
   const anyAmt = type === "iso" && (s1.amtExposure > 0 || s3.amtExposure > 0);
 
   return (
@@ -102,19 +108,19 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
           title="Exercise now, sell at event"
           desc="Pay for shares + tax now. Sell at event."
           outcome={s1}
-          isWinner={highest === 1}
+          badge={badgeFor(1)}
         />
         <ScenarioCard
           title="Wait, cashless at event"
           desc="No cash needed up front. All gain ordinary at event."
           outcome={s2}
-          isWinner={highest === 2}
+          badge={badgeFor(2)}
         />
         <ScenarioCard
           title="Exercise 25% now, rest at event"
           desc="Partial cost now. 25% gets LTCG, 75% ordinary."
           outcome={s3}
-          isWinner={highest === 3}
+          badge={badgeFor(3)}
         />
       </div>
 
@@ -125,10 +131,12 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
         Net is modeled before AMT timing. ISO exercises can owe AMT in
         the year you exercise even when the highlighted scenario shows
         the strongest net at sale, and the AMT credit may take years to
-        recover. The &ldquo;Highest modeled net&rdquo; tag compares
-        scenarios on the same simplifying assumptions, not on full tax
-        timing.{anyAmt
+        recover. The &ldquo;Highest sale net (before AMT timing)&rdquo;
+        tag compares scenarios on the same simplifying assumptions, not
+        on full tax timing.{anyAmt
           ? " The AMT exposure rows above show the spread that gets added to AMT income for ISO scenarios; it is not a tax bill on its own."
+          : ""}{tied
+          ? " Two or more scenarios are within $1 of each other, so no scenario is crowned in this view."
           : ""}
       </p>
     </div>
@@ -139,19 +147,25 @@ function ScenarioCard({
   title,
   desc,
   outcome,
-  isWinner,
+  badge,
 }: {
   title: string;
   desc: string;
   outcome: ScenarioOutcome;
-  isWinner: boolean;
+  badge: "higher" | "tied" | "none";
 }) {
   const { cash, amtExposure: amt, totalTax, net } = outcome;
+  const borderColor =
+    badge === "higher"
+      ? "var(--accent)"
+      : badge === "tied"
+        ? "var(--amber)"
+        : "var(--line)";
   return (
     <div
       className="rounded-md border p-5"
       style={{
-        borderColor: isWinner ? "var(--accent)" : "var(--line)",
+        borderColor,
         background: "var(--surface)",
       }}
     >
@@ -159,7 +173,7 @@ function ScenarioCard({
         <p className="text-base font-medium" style={{ color: "var(--text)" }}>
           {title}
         </p>
-        {isWinner && (
+        {badge === "higher" && (
           <span
             className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap"
             style={{
@@ -168,6 +182,17 @@ function ScenarioCard({
             }}
           >
             Highest sale net (before AMT timing)
+          </span>
+        )}
+        {badge === "tied" && (
+          <span
+            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap"
+            style={{
+              background: "var(--surface-alt)",
+              color: "var(--amber)",
+            }}
+          >
+            Tied at top
           </span>
         )}
       </div>

@@ -82,25 +82,59 @@ export function isoQualifying(i: OptionInputs): OptionOutcome {
 }
 
 /**
- * ISO DISQUALIFYING / SAME-YEAR SALE: holding rules not met. The
- * spread up to FMV at exercise is ordinary income, like an NSO. Any
- * gain above FMV between exercise and sale is short-term or long-term
- * capital gain depending on hold; this function models the common
- * "cashless exercise / same-year sale" path where everything is
- * ordinary and AMT does not accrue (because the disqualifying sale
- * unwinds the AMT preference).
+ * ISO DISQUALIFYING — SAME-DAY CASHLESS / SAME-YEAR SALE.
+ * The shares were sold the same day or the same calendar year as the
+ * exercise. The entire (sale − strike) gain is ordinary income (no
+ * LTCG bifurcation), and AMT does NOT accrue because the disqualifying
+ * sale in the same year unwinds the AMT preference.
+ *
+ * Use this for cashless-exercise patterns and short-window sales.
  */
-export function isoDisqualifying(i: OptionInputs): OptionOutcome {
+export function isoDisqualifyingCashless(i: OptionInputs): OptionOutcome {
   const cost = i.shares * i.strike;
   const total = i.shares * i.sale;
   const spread = spreadAtExercise(i.shares, i.fmv, i.strike);
+  const ordinaryGain = Math.max(0, (i.sale - i.strike) * i.shares);
+  const ordinaryTax = ordinaryGain * pctToFraction(i.ordinaryRate);
+  return {
+    cost,
+    spread,
+    amtExposure: 0,
+    taxAtExercise: ordinaryTax,
+    taxAtSale: 0,
+    net: total - cost - ordinaryTax,
+  };
+}
+
+/**
+ * ISO DISQUALIFYING — HELD AFTER EXERCISE.
+ * Held more than 1 year past exercise but less than 2 years past
+ * grant: the disposition is still disqualifying for ISO treatment,
+ * but the share has met the long-term capital gain holding period
+ * for any post-exercise appreciation. The bargain element at exercise
+ * (FMV − strike) is ordinary income; the remaining gain (sale − FMV)
+ * is LTCG. AMT preference unwinds back to regular tax in the year of
+ * the disqualifying sale, so we report it as zero.
+ *
+ * If the share was held for less than 1 year past exercise but past
+ * year-end (so STCG, not LTCG, would apply to the post-FMV gain), use
+ * the cashless variant or model the post-FMV piece at the ordinary
+ * rate manually. The library does not enumerate every holding-period
+ * sub-case.
+ */
+export function isoDisqualifyingHeld(i: OptionInputs): OptionOutcome {
+  const cost = i.shares * i.strike;
+  const total = i.shares * i.sale;
+  const spread = spreadAtExercise(i.shares, i.fmv, i.strike);
+  // Bargain element capped at the gain actually realized (so a sale
+  // below FMV doesn't manufacture ordinary income out of thin air).
   const ordinaryAtExercise =
     Math.min(
       Math.max(0, (i.sale - i.strike) * i.shares),
       Math.max(0, (i.fmv - i.strike) * i.shares),
     ) * pctToFraction(i.ordinaryRate);
-  const remainingGain = Math.max(0, (i.sale - i.fmv) * i.shares);
-  const ltcgPortion = remainingGain * pctToFraction(i.ltcgRate);
+  const postExerciseGain = Math.max(0, (i.sale - i.fmv) * i.shares);
+  const ltcgPortion = postExerciseGain * pctToFraction(i.ltcgRate);
   return {
     cost,
     spread,
@@ -338,7 +372,14 @@ export type ScenarioRanking = {
   s1: ScenarioOutcome;
   s2: ScenarioOutcome;
   s3: ScenarioOutcome;
-  highest: 1 | 2 | 3;
+  // Single winner index, or null when two or more scenarios are tied
+  // within $1 of each other. Mirrors OfferCompare neutral-tie behavior
+  // so the UI doesn't crown a winner created by floating-point noise
+  // or by genuinely equal nets.
+  highest: 1 | 2 | 3 | null;
+  // The set of scenario indices sharing the top net (length 1 if a
+  // unique winner, 2-3 if tied).
+  topScenarios: Array<1 | 2 | 3>;
   highestNet: number;
 };
 
@@ -346,14 +387,23 @@ export type ScenarioRanking = {
  * Rank the three scenarios by modeled net. Ranking is BEFORE AMT
  * timing — the ScenarioCompare UI surfaces AMT exposure separately
  * and warns that the ranking does not include AMT carrying cost.
+ *
+ * Tie threshold is $1: any scenarios within a dollar of the highest
+ * net are treated as tied. With multiple top scenarios, `highest` is
+ * null and `topScenarios` lists all of them; the UI paints a neutral
+ * "Tied at top" badge on each instead of crowning the first by
+ * iteration order.
  */
 export function rankScenarios(i: ScenarioInputs): ScenarioRanking {
   const s1 = exerciseNowSellAtEvent(i);
   const s2 = waitCashlessAtEvent(i);
   const s3 = exercise25NowRestAtEvent(i);
   const highestNet = Math.max(s1.net, s2.net, s3.net);
-  // First-match wins on ties so the ranking is deterministic.
-  const highest: 1 | 2 | 3 =
-    s1.net === highestNet ? 1 : s2.net === highestNet ? 2 : 3;
-  return { s1, s2, s3, highest, highestNet };
+  const tieEpsilon = 1;
+  const topScenarios: Array<1 | 2 | 3> = [];
+  if (Math.abs(s1.net - highestNet) < tieEpsilon) topScenarios.push(1);
+  if (Math.abs(s2.net - highestNet) < tieEpsilon) topScenarios.push(2);
+  if (Math.abs(s3.net - highestNet) < tieEpsilon) topScenarios.push(3);
+  const highest = topScenarios.length === 1 ? topScenarios[0] : null;
+  return { s1, s2, s3, highest, topScenarios, highestNet };
 }
