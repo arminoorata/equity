@@ -427,7 +427,14 @@ const taxSteps: Step[] = [
     heading: "Same numbers, different tax",
     takeaway:
       "ISOs reward patience with the qualifying disposition rules. NSOs front-load the ordinary-income hit. Set both side by side.",
-    blocks: [{ type: "widget", widget: "iso-vs-nso-compare" }],
+    blocks: [
+      { type: "widget", widget: "iso-vs-nso-compare" },
+      {
+        type: "callout",
+        severity: "info",
+        body: "None of this is tax advice. The point is to show you the shape of the math so you know what to ask.",
+      },
+    ],
     inlineQuiz: pickQuiz("tax", "iso-amt-spread"),
   },
   {
@@ -472,7 +479,7 @@ const taxSteps: Step[] = [
     id: "section-83b",
     heading: "83(b): 30 days, no extensions",
     takeaway:
-      "If you early-exercise unvested options, an 83(b) election lets you be taxed at today's (low) value. The window is 30 days from exercise. Miss it and the option is gone.",
+      "If you early-exercise unvested options, an 83(b) election lets you be taxed at today's (low) value. The window is 30 days from exercise. Miss it and you lose the 83(b) treatment. No extensions.",
     inlineQuiz: pickQuiz("tax", "83b-deadline"),
     details: [
       {
@@ -523,6 +530,12 @@ const liquiditySteps: Step[] = [
         type: "callout",
         severity: "info",
         body: "The 409A tells you what the IRS thinks your shares are worth. It does not tell you what someone will actually pay.",
+      },
+      {
+        type: "callout",
+        severity: "amber",
+        title: "Two rules that keep people out of trouble",
+        body: "Don't make financial commitments based on paper value. Don't count on equity for short-term cash needs.",
       },
     ],
   },

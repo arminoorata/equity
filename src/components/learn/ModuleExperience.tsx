@@ -93,9 +93,8 @@ export default function ModuleExperience({
             }}
           />
         </div>
-        <ul
-          className="mt-3 flex flex-wrap items-center gap-1.5"
-          role="tablist"
+        <ol
+          className="mt-3 flex flex-wrap items-center"
           aria-label="Module steps"
         >
           {stepIndices.map((i) => {
@@ -105,27 +104,36 @@ export default function ModuleExperience({
               <li key={i}>
                 <button
                   type="button"
-                  role="tab"
-                  aria-selected={active}
-                  aria-label={`Step ${i + 1}: ${steps[i].heading}`}
+                  aria-current={active ? "step" : undefined}
+                  aria-label={`Go to step ${i + 1}: ${steps[i].heading}`}
                   onClick={() => setIndex(i)}
-                  className="rounded-full"
+                  className="inline-flex items-center justify-center bg-transparent"
                   style={{
-                    width: 18,
-                    height: 6,
-                    background: active
-                      ? "var(--accent)"
-                      : visited
-                        ? "var(--accent-soft)"
-                        : "var(--line)",
+                    width: 32,
+                    height: 32,
+                    padding: 0,
                     border: "none",
                     cursor: "pointer",
                   }}
-                />
+                >
+                  <span
+                    aria-hidden
+                    className="rounded-full block"
+                    style={{
+                      width: 22,
+                      height: 6,
+                      background: active
+                        ? "var(--accent)"
+                        : visited
+                          ? "var(--accent-soft)"
+                          : "var(--line)",
+                    }}
+                  />
+                </button>
               </li>
             );
           })}
-        </ul>
+        </ol>
       </div>
 
       {/* The step itself */}

@@ -31,8 +31,8 @@ export default function LearnPage() {
           Equity Education Portal
         </p>
         <h1
-          className="mt-4 text-2xl font-medium leading-snug tracking-tight md:text-[28px]"
-          style={{ color: "var(--text)" }}
+          className="mt-4 text-[16px] font-normal leading-7"
+          style={{ color: "var(--text-secondary)" }}
         >
           Equity can expire, surprise you with taxes, or become real money.
           Pick what you have and see the few decisions that matter.
