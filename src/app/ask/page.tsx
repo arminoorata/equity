@@ -3,10 +3,10 @@ import AskView from "@/components/ask/AskView";
 export const metadata = { title: "Ask" };
 
 /**
- * Ask tab. BYOK chat. The user pastes an Anthropic API key, the chat
- * surface unlocks. Calls api.anthropic.com directly from the browser
- * with `anthropic-dangerous-direct-browser-access`. No backend, no
- * logged-in account, no chat log on our side.
+ * Ask tab. BYOK chat. The user pastes a Google AI Studio API key, the
+ * chat surface unlocks. Calls generativelanguage.googleapis.com
+ * directly from the browser with the key as x-goog-api-key. No
+ * backend, no logged-in account, no chat log on our side.
  */
 export default function AskPage() {
   return (
@@ -25,9 +25,10 @@ export default function AskPage() {
         style={{ color: "var(--text-secondary)" }}
       >
         Educational chat about ISOs, NSOs, RSUs, AMT, lock-ups, tender
-        offers, and the rest of equity comp. Bring your own Anthropic API
-        key. Your key, your conversation, and any plan document you
-        upload stay in your browser and travel only to Anthropic.
+        offers, and the rest of equity comp. Bring your own Google AI
+        Studio key (free tier, no credit card). Your key, your
+        conversation, and any plan document you upload stay in your
+        browser and travel only to Google.
       </p>
       <div className="mt-10">
         <AskView />

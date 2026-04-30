@@ -1,18 +1,16 @@
-import type {
-  ChatMessage,
-  ChatModel,
-  Grant,
-  PlanDoc,
-} from "@/lib/state/PortalContext";
+import type { ChatMessage, Grant, PlanDoc } from "@/lib/state/PortalContext";
 
 /**
- * Direct browser-to-Anthropic call helper. The Equity Toolkit has no
- * backend; the user's API key sits in their browser, requests go to
- * api.anthropic.com directly with `anthropic-dangerous-direct-browser-access`.
+ * Direct browser-to-Google Gemini call helper. The Equity Toolkit has
+ * no backend; the user's API key sits in their browser, requests go to
+ * generativelanguage.googleapis.com directly with the key passed as
+ * the x-goog-api-key header.
  *
- * The key, the chat history, and any uploaded plan document never
- * touch a server we operate.
+ * Model: gemini-2.5-pro on the free tier. The key, the chat history,
+ * and any uploaded plan document never touch a server we operate.
  */
+
+export const GEMINI_MODEL = "gemini-2.5-pro";
 
 const SYSTEM_PROMPT_BASE = `You are an equity compensation educator for a free public web tool built by Armi Noorata. Your readers are people trying to understand their own stock options, RSUs, or other equity grants. Some are getting their first grant. Some have been vesting for years. Treat them like adults who can handle real information without being condescended to.
 
@@ -70,65 +68,64 @@ export function buildSystemPrompt(
   return SYSTEM_PROMPT_BASE + grantSummary(grants, companyType) + planDocAddendum(doc);
 }
 
-type RawAnthropicMessage =
-  | { role: "user" | "assistant"; content: string }
+type GeminiPart =
+  | { text: string }
   | {
-      role: "user";
-      content: Array<
-        | {
-            type: "document";
-            source: {
-              type: "base64";
-              media_type: string;
-              data: string;
-            };
-          }
-        | { type: "text"; text: string }
-      >;
+      inline_data: {
+        mime_type: string;
+        data: string;
+      };
     };
 
-function buildMessages(
+type GeminiContent = {
+  role: "user" | "model";
+  parts: GeminiPart[];
+};
+
+function buildContents(
   messages: ChatMessage[],
   doc: PlanDoc | null,
-): RawAnthropicMessage[] {
-  if (!doc || messages.length === 0) {
-    return messages.map((m) => ({ role: m.role, content: m.content }));
-  }
-  // Attach the document to the first user message only.
-  const out: RawAnthropicMessage[] = [];
-  let attached = false;
-  for (const m of messages) {
-    if (!attached && m.role === "user") {
+): GeminiContent[] {
+  if (messages.length === 0) return [];
+  // Gemini uses "model" instead of "assistant" for the AI's role.
+  const mapped: GeminiContent[] = messages.map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+  if (!doc) return mapped;
+
+  // Attach the document to the first user turn only.
+  for (let i = 0; i < mapped.length; i++) {
+    if (mapped[i].role === "user") {
+      const userText = mapped[i].parts[0];
+      const text = "text" in userText ? userText.text : "";
       if (doc.type === "pdf") {
-        out.push({
+        mapped[i] = {
           role: "user",
-          content: [
+          parts: [
             {
-              type: "document",
-              source: {
-                type: "base64",
-                media_type: doc.mimeType || "application/pdf",
+              inline_data: {
+                mime_type: doc.mimeType || "application/pdf",
                 data: doc.data,
               },
             },
-            { type: "text", text: m.content },
+            { text },
           ],
-        });
+        };
       } else {
-        // Text/markdown: prepend the document text in front of the
-        // user's message. Wrap so the model can see boundaries.
         const wrapped =
           `Plan document "${doc.name}" follows between the markers, then my question.\n\n` +
           `--- BEGIN DOCUMENT ---\n${doc.data}\n--- END DOCUMENT ---\n\n` +
-          m.content;
-        out.push({ role: "user", content: wrapped });
+          text;
+        mapped[i] = {
+          role: "user",
+          parts: [{ text: wrapped }],
+        };
       }
-      attached = true;
-    } else {
-      out.push({ role: m.role, content: m.content });
+      break;
     }
   }
-  return out;
+  return mapped;
 }
 
 export type SendChatResult =
@@ -141,38 +138,39 @@ export type SendChatResult =
 
 export async function sendChat({
   apiKey,
-  model,
   systemPrompt,
   messages,
   planDoc,
   signal,
 }: {
   apiKey: string;
-  model: ChatModel;
   systemPrompt: string;
   messages: ChatMessage[];
   planDoc: PlanDoc | null;
   signal?: AbortSignal;
 }): Promise<SendChatResult> {
-  const apiMessages = buildMessages(messages, planDoc);
+  const contents = buildContents(messages, planDoc);
   let response: Response;
   try {
-    response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true",
+    response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-goog-api-key": apiKey,
+        },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents,
+          generationConfig: {
+            maxOutputTokens: 1024,
+            temperature: 0.7,
+          },
+        }),
+        signal,
       },
-      body: JSON.stringify({
-        model,
-        max_tokens: 1024,
-        system: systemPrompt,
-        messages: apiMessages,
-      }),
-      signal,
-    });
+    );
   } catch (err) {
     return {
       ok: false,
@@ -180,11 +178,11 @@ export async function sendChat({
       message:
         err instanceof Error && err.name === "AbortError"
           ? "Request was cancelled."
-          : "Couldn't reach Anthropic. Check your connection.",
+          : "Couldn't reach Google. Check your connection.",
     };
   }
 
-  if (response.status === 401) {
+  if (response.status === 401 || response.status === 403) {
     return {
       ok: false,
       kind: "auth",
@@ -196,13 +194,15 @@ export async function sendChat({
       ok: false,
       kind: "rate",
       message:
-        "You've hit Anthropic's rate limit on your account. Try again in a minute.",
+        "You've hit Google's free-tier rate limit on this key. Wait a minute and try again. Daily caps reset at midnight Pacific.",
     };
   }
   if (response.status === 400) {
-    let detail = "Anthropic rejected the request.";
+    let detail = "Google rejected the request.";
     try {
-      const data = (await response.json()) as { error?: { message?: string } };
+      const data = (await response.json()) as {
+        error?: { message?: string };
+      };
       if (data?.error?.message) detail = data.error.message;
     } catch {
       // ignore parse errors
@@ -217,7 +217,7 @@ export async function sendChat({
     return {
       ok: false,
       kind: "server",
-      message: "Anthropic seems to be having issues. Try again.",
+      message: "Google seems to be having issues. Try again.",
     };
   }
   if (!response.ok) {
@@ -231,18 +231,30 @@ export async function sendChat({
   let text = "";
   try {
     const data = (await response.json()) as {
-      content?: Array<{ type: string; text?: string }>;
+      candidates?: Array<{
+        content?: { parts?: Array<{ text?: string }> };
+        finishReason?: string;
+      }>;
+      promptFeedback?: { blockReason?: string };
     };
+    if (data?.promptFeedback?.blockReason) {
+      return {
+        ok: false,
+        kind: "validation",
+        message: `Google blocked the request (${data.promptFeedback.blockReason}). Rephrase and try again.`,
+      };
+    }
+    const first = data?.candidates?.[0];
     text =
-      data?.content
-        ?.filter((c) => c.type === "text" && typeof c.text === "string")
-        ?.map((c) => c.text as string)
+      first?.content?.parts
+        ?.map((p) => p.text ?? "")
+        ?.filter(Boolean)
         ?.join("\n\n") ?? "";
   } catch {
     return {
       ok: false,
       kind: "server",
-      message: "Anthropic returned a response I couldn't parse.",
+      message: "Google returned a response I couldn't parse.",
     };
   }
 
@@ -250,7 +262,7 @@ export async function sendChat({
     return {
       ok: false,
       kind: "server",
-      message: "Anthropic returned an empty response.",
+      message: "Google returned an empty response.",
     };
   }
   return { ok: true, text };

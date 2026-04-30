@@ -54,8 +54,6 @@ export type PlanDoc = {
   data: string;
 };
 
-export type ChatModel = "claude-haiku-4-5" | "claude-sonnet-4-6";
-
 export type Profile = {
   name?: string;
   experience?: "beginner" | "intermediate" | "advanced";
@@ -135,8 +133,6 @@ type PortalContextValue = {
   setApiKey: (k: string) => void;
   rememberKey: boolean;
   setRememberKey: (b: boolean) => void;
-  chatModel: ChatModel;
-  setChatModel: (m: ChatModel) => void;
   messages: ChatMessage[];
   setMessages: (m: ChatMessage[]) => void;
   appendMessage: (m: ChatMessage) => void;
@@ -158,7 +154,6 @@ export function PortalProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [apiKey, setApiKeyState] = useState("");
   const [rememberKey, setRememberKeyState] = useState(false);
-  const [chatModel, setChatModelState] = useState<ChatModel>("claude-haiku-4-5");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [planDoc, setPlanDoc] = useState<PlanDoc | null>(null);
 
@@ -186,16 +181,19 @@ export function PortalProvider({ children }: { children: ReactNode }) {
           window.localStorage.getItem("remember_key") === "true";
         if (rememberK) {
           setRememberKeyState(true);
-          const k = window.localStorage.getItem("anthropic_key") ?? "";
+          const k = window.localStorage.getItem("gemini_key") ?? "";
           if (k) setApiKeyState(k);
         } else {
-          const k = window.sessionStorage.getItem("anthropic_key") ?? "";
+          const k = window.sessionStorage.getItem("gemini_key") ?? "";
           if (k) setApiKeyState(k);
         }
-
-        const savedModel = window.localStorage.getItem("chat_model");
-        if (savedModel === "claude-haiku-4-5" || savedModel === "claude-sonnet-4-6") {
-          setChatModelState(savedModel);
+        // One-time cleanup of legacy Anthropic-era keys.
+        try {
+          window.localStorage.removeItem("anthropic_key");
+          window.sessionStorage.removeItem("anthropic_key");
+          window.localStorage.removeItem("chat_model");
+        } catch {
+          // ignore
         }
       } catch {
         // ignore parse / storage errors
@@ -235,15 +233,15 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     try {
       if (apiKey) {
         if (rememberKey) {
-          window.localStorage.setItem("anthropic_key", apiKey);
-          window.sessionStorage.removeItem("anthropic_key");
+          window.localStorage.setItem("gemini_key", apiKey);
+          window.sessionStorage.removeItem("gemini_key");
         } else {
-          window.sessionStorage.setItem("anthropic_key", apiKey);
-          window.localStorage.removeItem("anthropic_key");
+          window.sessionStorage.setItem("gemini_key", apiKey);
+          window.localStorage.removeItem("gemini_key");
         }
       } else {
-        window.localStorage.removeItem("anthropic_key");
-        window.sessionStorage.removeItem("anthropic_key");
+        window.localStorage.removeItem("gemini_key");
+        window.sessionStorage.removeItem("gemini_key");
       }
       if (rememberKey) {
         window.localStorage.setItem("remember_key", "true");
@@ -255,17 +253,6 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     }
   }, [apiKey, rememberKey, hydrated]);
 
-  // Persist chat-model selection. Cheap, no privacy implications.
-  useEffect(() => {
-    if (!hydrated) return;
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem("chat_model", chatModel);
-    } catch {
-      // ignore
-    }
-  }, [chatModel, hydrated]);
-
   const setRememberGrants = useCallback((b: boolean) => {
     setRememberGrantsState(b);
   }, []);
@@ -276,10 +263,6 @@ export function PortalProvider({ children }: { children: ReactNode }) {
 
   const setRememberKey = useCallback((b: boolean) => {
     setRememberKeyState(b);
-  }, []);
-
-  const setChatModel = useCallback((m: ChatModel) => {
-    setChatModelState(m);
   }, []);
 
   const appendMessage = useCallback((m: ChatMessage) => {
@@ -342,13 +325,11 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     setRememberKeyState(false);
     setMessages([]);
     setPlanDoc(null);
-    setChatModelState("claude-haiku-4-5");
     if (typeof window === "undefined") return;
     try {
-      sessionStorage.removeItem("anthropic_key");
-      localStorage.removeItem("anthropic_key");
+      sessionStorage.removeItem("gemini_key");
+      localStorage.removeItem("gemini_key");
       localStorage.removeItem("remember_key");
-      localStorage.removeItem("chat_model");
       localStorage.removeItem(STORAGE_KEY_GRANTS);
       localStorage.removeItem(STORAGE_KEY_REMEMBER);
     } catch {
@@ -376,8 +357,6 @@ export function PortalProvider({ children }: { children: ReactNode }) {
       setApiKey,
       rememberKey,
       setRememberKey,
-      chatModel,
-      setChatModel,
       messages,
       setMessages,
       appendMessage,
@@ -404,8 +383,6 @@ export function PortalProvider({ children }: { children: ReactNode }) {
       setApiKey,
       rememberKey,
       setRememberKey,
-      chatModel,
-      setChatModel,
       messages,
       appendMessage,
       clearMessages,

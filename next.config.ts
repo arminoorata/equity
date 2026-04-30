@@ -2,10 +2,11 @@ import type { NextConfig } from "next";
 
 /**
  * Content-Security-Policy is set per the security model in
- * spec/01-ARCHITECTURE.md. The Ask tab calls api.anthropic.com from
- * the browser; that is the only outbound origin we allow. Restricting
- * connect-src and frame-ancestors closes off the most common
- * exfiltration paths if a malicious script ever made it onto the page.
+ * spec/01-ARCHITECTURE.md. The Ask tab calls
+ * generativelanguage.googleapis.com from the browser; that is the only
+ * outbound origin we allow. Restricting connect-src and frame-ancestors
+ * closes off the most common exfiltration paths if a malicious script
+ * ever made it onto the page.
  */
 const csp = [
   "default-src 'self'",
@@ -19,7 +20,7 @@ const csp = [
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob:",
   // The Ask tab is the only place we make a cross-origin call.
-  "connect-src 'self' https://api.anthropic.com",
+  "connect-src 'self' https://generativelanguage.googleapis.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

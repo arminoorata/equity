@@ -141,9 +141,9 @@ export default function ForEmployersPage() {
               No app backend, no logged-in account, no client analytics
               tags. Vercel sees request-level traffic at the platform
               layer, the same as for any static site. The Ask tab uses
-              the reader&rsquo;s own Anthropic API key to call
-              Anthropic directly, with no key or conversation routed
-              through this site.
+              the reader&rsquo;s own Google AI Studio API key to call
+              Google&rsquo;s Gemini API directly, with no key or
+              conversation routed through this site.
             </li>
             <li>
               No actual AMT owed. The calculators show AMT exposure
@@ -163,11 +163,13 @@ export default function ForEmployersPage() {
 
         <Block heading="Third-party AI notice for the Ask tab">
           <p>
-            The Ask tab calls Anthropic, a third-party AI provider, from
-            the reader&rsquo;s browser using their own API key. The tool
-            never sees the key or the conversation. Even so, plan
-            documents and grant data leave the reader&rsquo;s machine
-            and reach Anthropic when uploaded or quoted.
+            The Ask tab calls Google&rsquo;s Gemini API, a third-party AI
+            provider, from the reader&rsquo;s browser using their own
+            free-tier key. The tool never sees the key or the
+            conversation. Even so, plan documents and grant data leave
+            the reader&rsquo;s machine and reach Google when uploaded
+            or quoted. Free-tier Gemini may use prompts and responses
+            to improve their models; paid Gemini API tiers do not.
           </p>
           <p>
             If your company prohibits sending compensation or
@@ -175,8 +177,8 @@ export default function ForEmployersPage() {
             to use the Ask tab with generic questions only and skip the
             plan-document upload. The empty-state copy and the upload
             UI both surface that warning. The educational tabs (Learn,
-            Vesting, Calculators, Exercise, Glossary) do not call
-            Anthropic and are unaffected.
+            Vesting, Calculators, Exercise, Glossary) do not call any
+            AI service and are unaffected.
           </p>
         </Block>
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePortal } from "@/lib/state/PortalContext";
-import { buildSystemPrompt, sendChat } from "@/lib/anthropic";
+import { buildSystemPrompt, sendChat } from "@/lib/gemini";
 import KeyEmptyState from "./KeyEmptyState";
 import ChatEmptyState from "./ChatEmptyState";
 import ChatThread from "./ChatThread";
@@ -20,7 +20,6 @@ export default function AskView() {
   const {
     profile,
     apiKey,
-    chatModel,
     messages,
     appendMessage,
     clearMessages,
@@ -79,7 +78,6 @@ export default function AskView() {
       abortRef.current = controller;
       const result = await sendChat({
         apiKey,
-        model: chatModel,
         systemPrompt,
         messages: [...messages, userMessage],
         planDoc,
@@ -108,7 +106,6 @@ export default function AskView() {
     [
       apiKey,
       appendMessage,
-      chatModel,
       messages,
       pending,
       planDoc,

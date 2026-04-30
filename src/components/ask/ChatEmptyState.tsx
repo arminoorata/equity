@@ -188,9 +188,10 @@ function PlanDocUpload() {
         className="mt-2 text-xs"
         style={{ color: "var(--amber)" }}
       >
-        Anthropic is a third-party AI provider. Some employers prohibit
-        sending plan documents to outside AI services. Check your
-        company&rsquo;s policy before uploading.
+        Google Gemini is a third-party AI provider. Some employers
+        prohibit sending plan documents to outside AI services, and
+        free-tier Gemini may use prompts to improve their models. Check
+        your company&rsquo;s policy before uploading.
       </p>
       <button
         type="button"
@@ -230,8 +231,6 @@ function PlanDocUpload() {
 
 function SettingsPanel() {
   const {
-    chatModel,
-    setChatModel,
     rememberKey,
     setRememberKey,
     setApiKey,
@@ -252,38 +251,18 @@ function SettingsPanel() {
         >
           Model
         </p>
-        <div
-          className="mt-2 inline-flex flex-wrap gap-1 rounded-full border p-1"
-          style={{ borderColor: "var(--line)", background: "var(--bg)" }}
-          role="radiogroup"
-          aria-label="Chat model"
+        <p
+          className="mt-2 mono text-xs"
+          style={{ color: "var(--text-secondary)" }}
         >
-          {(
-            [
-              { id: "claude-haiku-4-5", label: "Haiku (fast)" },
-              { id: "claude-sonnet-4-6", label: "Sonnet (deep)" },
-            ] as const
-          ).map((opt) => {
-            const active = chatModel === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                role="radio"
-                aria-checked={active}
-                onClick={() => setChatModel(opt.id)}
-                className="rounded-full px-3 py-1 text-xs"
-                style={{
-                  background: active ? "var(--accent-soft)" : "transparent",
-                  color: active ? "var(--text)" : "var(--text-muted)",
-                  fontWeight: active ? 600 : 500,
-                }}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
+          gemini-2.5-pro
+        </p>
+        <p
+          className="mt-1 text-[11px]"
+          style={{ color: "var(--text-muted)" }}
+        >
+          Free tier. Daily and per-minute limits apply.
+        </p>
       </div>
 
       <label

@@ -613,21 +613,63 @@ function DateField({
   value: string;
   onChange: (s: string) => void;
 }) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  // Native browser calendar icons disappear into dark backgrounds on
+  // Chrome / Safari, so a custom icon button always sits on the right
+  // and calls showPicker() to surface the native calendar reliably.
+  const openPicker = () => {
+    const node = inputRef.current;
+    if (!node) return;
+    try {
+      // showPicker is supported across modern browsers and is the
+      // sanctioned way to open the date popup from a click.
+      const maybe = node as HTMLInputElement & { showPicker?: () => void };
+      if (typeof maybe.showPicker === "function") {
+        maybe.showPicker();
+        return;
+      }
+    } catch {
+      // ignore. fall through to focus
+    }
+    node.focus();
+  };
   return (
     <span
       className="inline-flex w-full items-center gap-2 rounded-md border px-2.5 py-1.5"
       style={{ borderColor: "var(--border)", background: "var(--bg)" }}
     >
       <input
+        ref={inputRef}
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="mono w-full bg-transparent text-[14px]"
-        // colorScheme keeps the native date picker (calendar popup,
-        // year/month dropdowns) styled to match light/dark theme so
-        // the icon and dropdown text don't disappear in dark mode.
         style={{ color: "var(--text)", colorScheme: "light dark" }}
       />
+      <button
+        type="button"
+        onClick={openPicker}
+        aria-label="Open calendar"
+        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
+        style={{ color: "var(--accent)", background: "var(--surface-alt)" }}
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      </button>
     </span>
   );
 }
