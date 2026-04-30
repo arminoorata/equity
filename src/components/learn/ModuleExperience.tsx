@@ -199,7 +199,7 @@ export default function ModuleExperience({
             }}
           >
             <summary
-              className="cursor-pointer list-none rounded-md px-4 py-2.5 text-[12.5px] font-semibold uppercase tracking-[0.18em] outline-none"
+              className="cursor-pointer list-none rounded-md px-4 py-2.5 text-[12.5px] font-semibold uppercase tracking-[0.18em] focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
               style={{ color: "var(--accent)" }}
             >
               <span aria-hidden style={{ marginRight: 8 }}>

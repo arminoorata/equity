@@ -1,17 +1,15 @@
 /**
- * Step-based content for the redesigned Learn flow. Each module's
- * existing `sections` blocks are repackaged into bite-sized steps:
+ * Step-based content for the Learn flow. This file is the single
+ * source of truth for what visitors actually read in each module:
  *
  *   takeaway (1-3 sentences) -> optional widget / table / worked-example
  *     -> optional inline quiz check -> "Show details" disclosure for depth
  *
- * The original `sections` data in `modules.ts` stays put for SEO and
- * for any future search/index usage. The page now renders these
- * `steps` instead of the old article layout.
- *
  * Authoring rule of thumb: visible content is the smallest thing that
  * answers the step heading. Any longer paragraph, table, or
- * legal/tax nuance from the original section goes into `details`.
+ * legal/tax nuance goes into `details`. `modules.ts` only carries
+ * module-level metadata (title, blurb for SEO, last-reviewed date,
+ * questions-to-ask) - all narrative content lives here.
  */
 
 import type { Block } from "./modules";
