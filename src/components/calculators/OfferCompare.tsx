@@ -65,12 +65,14 @@ export default function OfferCompare() {
         className="text-xs leading-6"
         style={{ color: "var(--text-muted)" }}
       >
-        Rough scenario estimate. The expected sale price is your guess,
-        not the company&rsquo;s commitment. The after-tax line for
-        options assumes long-term capital gains treatment, which only
-        applies if you exercise + hold for the qualifying periods.
-        Cashless exercise, leaving early, or holding NSOs all change the
-        picture. Treat this as a sanity check, not the answer.
+        Rough scenario estimate, not a verdict. The expected sale price
+        is your guess, not the company&rsquo;s commitment. Options are
+        modeled as long-term-capital-gains-eligible, which only applies
+        to ISOs that meet the qualifying-disposition holding rules.
+        Cashless exercise, leaving early before vest, holding NSOs, AMT
+        on ISO exercises, and the difference between RSU vest year and
+        sale year all change the picture and are not in the model. Use
+        this to sanity-check tradeoffs, not to pick an offer.
       </p>
     </div>
   );
@@ -172,8 +174,9 @@ function OfferCard({
           <span
             className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
             style={{ background: "var(--accent-soft)", color: "var(--accent)" }}
+            title="This scenario has the higher modeled total. The model is intentionally simple. Real take-home depends on exercise timing, AMT, vest schedules, and many things this view does not capture."
           >
-            Higher under these assumptions
+            Higher in this model
           </span>
         )}
       </div>

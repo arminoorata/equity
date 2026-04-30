@@ -72,6 +72,7 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
   const s3Net = shares * ipo - shares * strike - s3TaxNow - s3TaxLater;
 
   const winnerNet = Math.max(s1Net, s2Net, s3Net);
+  const anyAmt = type === "iso" && (s1Amt > 0 || s3Amt > 0);
 
   return (
     <div className="space-y-6">
@@ -152,6 +153,20 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
           isWinner={s3Net === winnerNet}
         />
       </div>
+
+      <p
+        className="text-xs leading-6"
+        style={{ color: "var(--text-muted)" }}
+      >
+        Net is modeled before AMT timing. ISO exercises can owe AMT in
+        the year you exercise even when the highlighted scenario shows
+        the strongest net at sale, and the AMT credit may take years to
+        recover. The &ldquo;Highest modeled net&rdquo; tag compares
+        scenarios on the same simplifying assumptions, not on full tax
+        timing.{anyAmt
+          ? " The AMT exposure rows above show the spread that gets added to AMT income for ISO scenarios; it is not a tax bill on its own."
+          : ""}
+      </p>
     </div>
   );
 }
@@ -192,6 +207,7 @@ function ScenarioCard({
               background: "var(--accent-soft)",
               color: "var(--accent)",
             }}
+            title="Highest net under the modeled assumptions. AMT timing is not included."
           >
             Highest modeled net
           </span>

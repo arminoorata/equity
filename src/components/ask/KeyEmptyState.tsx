@@ -158,10 +158,10 @@ export default function KeyEmptyState() {
               starts with <span className="mono">AIza</span>.
             </li>
             <li>
-              Paste it into the field above. The free tier on{" "}
-              <span className="mono">gemini-2.5-pro</span> doesn&rsquo;t
-              ask for a credit card. You will hit daily and per-minute
-              caps if you chat heavily; that&rsquo;s normal on free.
+              Paste it into the field above. The free tier on the
+              latest stable Gemini model doesn&rsquo;t ask for a credit
+              card. You will hit daily and per-minute caps if you chat
+              heavily; that&rsquo;s normal on free.
             </li>
           </ol>
         </details>

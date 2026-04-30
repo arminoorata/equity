@@ -3,6 +3,7 @@
 import { useId, useRef, useState } from "react";
 import { usePortal } from "@/lib/state/PortalContext";
 import type { PlanDoc } from "@/lib/state/PortalContext";
+import { GEMINI_MODEL } from "@/lib/gemini";
 import FaqBank from "./FaqBank";
 
 const SUGGESTED_DEFAULT = [
@@ -257,7 +258,7 @@ function SettingsPanel() {
           className="mt-2 mono text-xs"
           style={{ color: "var(--text-secondary)" }}
         >
-          gemini-2.5-pro
+          {GEMINI_MODEL}
         </p>
         <p
           className="mt-1 text-[11px]"

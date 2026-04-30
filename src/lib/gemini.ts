@@ -6,11 +6,16 @@ import type { ChatMessage, Grant, PlanDoc } from "@/lib/state/PortalContext";
  * generativelanguage.googleapis.com directly with the key passed as
  * the x-goog-api-key header.
  *
- * Model: gemini-2.5-pro on the free tier. The key, the chat history,
- * and any uploaded plan document never touch a server we operate.
+ * Model: gemini-2.5-flash on the free tier. Flash is the right pick
+ * for a public BYOK education tool because it has the highest free
+ * daily quota and is not on Google's deprecation calendar. The pro
+ * variant has been listed for shutdown, so anchor the tool to flash
+ * and revisit when Google rolls a new stable family. The key, the
+ * chat history, and any uploaded plan document never touch a server
+ * we operate.
  */
 
-export const GEMINI_MODEL = "gemini-2.5-pro";
+export const GEMINI_MODEL = "gemini-2.5-flash";
 
 const SYSTEM_PROMPT_BASE = `You are an equity compensation educator for a free public web tool built by Armi Noorata. Your readers are people trying to understand their own stock options, RSUs, or other equity grants. Some are getting their first grant. Some have been vesting for years. Treat them like adults who can handle real information without being condescended to.
 
