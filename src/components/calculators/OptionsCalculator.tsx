@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CalcNumber, ResultRow, fmt } from "./CalcInput";
 import Abbr from "@/components/ui/Abbr";
 import type { Profile } from "@/lib/state/PortalContext";
+import { isoQualifying, nsoExerciseAndSell } from "@/lib/tax";
 
 /**
  * Options calculator. Renders ISO and NSO outcomes side by side from
@@ -25,20 +26,17 @@ export default function OptionsCalculator({ profile }: { profile: Profile }) {
   const [tax, setTax] = useState(35);
   const [ltcg, setLtcg] = useState(15);
 
-  const cost = shares * strike;
-  const spread = (fmv - strike) * shares;
-  const total = shares * sale;
-
-  // ISO (qualifying disposition assumed). Floor at zero: a sale below
-  // strike is a capital loss, not a positive tax bill.
-  const isoTaxAtSale = Math.max(0, (sale - strike) * shares) * (ltcg / 100);
-  const isoNet = total - cost - isoTaxAtSale;
-
-  // NSO
-  const nsoTaxAtExercise = Math.max(0, spread) * (tax / 100);
+  const inputs = {
+    shares,
+    strike,
+    fmv,
+    sale,
+    ordinaryRate: tax,
+    ltcgRate: ltcg,
+  };
+  const iso = isoQualifying(inputs);
+  const nso = nsoExerciseAndSell(inputs);
   const nsoAdditional = Math.max(0, (sale - fmv) * shares);
-  const nsoTaxAtSale = nsoAdditional * (ltcg / 100);
-  const nsoNet = total - cost - nsoTaxAtExercise - nsoTaxAtSale;
 
   return (
     <div className="space-y-6">
@@ -53,10 +51,10 @@ export default function OptionsCalculator({ profile }: { profile: Profile }) {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Card title="ISO" subtitle="Qualifying disposition (held 1y past exercise + 2y past grant)">
-          <ResultRow label="Exercise cost" value={fmt(cost)} hint="shares × strike" />
+          <ResultRow label="Exercise cost" value={fmt(iso.cost)} hint="shares × strike" />
           <ResultRow
             label="Spread at exercise"
-            value={fmt(Math.max(0, spread))}
+            value={fmt(iso.spread)}
             hint={
               <>
                 (
@@ -81,7 +79,7 @@ export default function OptionsCalculator({ profile }: { profile: Profile }) {
                 exposure
               </>
             }
-            value={fmt(Math.max(0, spread))}
+            value={fmt(iso.amtExposure)}
             tone="warning"
             hint="separate from regular tax"
           />
@@ -96,15 +94,15 @@ export default function OptionsCalculator({ profile }: { profile: Profile }) {
                 )
               </>
             }
-            value={fmt(isoTaxAtSale)}
+            value={fmt(iso.taxAtSale)}
           />
-          <ResultRow label="Net proceeds" value={fmt(isoNet)} tone="good" />
+          <ResultRow label="Net proceeds" value={fmt(iso.net)} tone="good" />
         </Card>
 
         <Card title="NSO" subtitle="Spread is ordinary income at exercise">
-          <ResultRow label="Exercise cost" value={fmt(cost)} hint="shares × strike" />
-          <ResultRow label="Spread at exercise" value={fmt(Math.max(0, spread))} />
-          <ResultRow label="Tax at exercise" value={fmt(nsoTaxAtExercise)} tone="warning" hint="ordinary income on the spread" />
+          <ResultRow label="Exercise cost" value={fmt(nso.cost)} hint="shares × strike" />
+          <ResultRow label="Spread at exercise" value={fmt(nso.spread)} />
+          <ResultRow label="Tax at exercise" value={fmt(nso.taxAtExercise)} tone="warning" hint="ordinary income on the spread" />
           <ResultRow label="Additional gain at sale" value={fmt(nsoAdditional)} />
           <ResultRow
             label={
@@ -117,9 +115,9 @@ export default function OptionsCalculator({ profile }: { profile: Profile }) {
                 )
               </>
             }
-            value={fmt(nsoTaxAtSale)}
+            value={fmt(nso.taxAtSale)}
           />
-          <ResultRow label="Net proceeds" value={fmt(nsoNet)} tone="good" />
+          <ResultRow label="Net proceeds" value={fmt(nso.net)} tone="good" />
         </Card>
       </div>
 

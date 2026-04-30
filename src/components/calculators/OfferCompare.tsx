@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CalcNumber, ResultRow, fmt } from "./CalcInput";
+import { offerOutcome, type OfferOutcome } from "@/lib/tax";
 
 /**
  * Offer comparison. Side-by-side 4-year expected take-home for two
@@ -29,7 +30,13 @@ export default function OfferCompare() {
   const a = useMemo(() => evaluate(offerA, tax, ltcg, years), [offerA, tax, ltcg, years]);
   const b = useMemo(() => evaluate(offerB, tax, ltcg, years), [offerB, tax, ltcg, years]);
 
-  const winnerNet = Math.max(a.afterTax, b.afterTax);
+  // Tie handling: if the two scenarios are within $1 of each other,
+  // show a neutral "Tied" badge on both rather than crowning a winner
+  // by floating-point noise. Otherwise the strictly greater scenario
+  // gets the higher-in-this-model badge.
+  const tied = Math.abs(a.afterTax - b.afterTax) < 1;
+  const aHigher = !tied && a.afterTax > b.afterTax;
+  const bHigher = !tied && b.afterTax > a.afterTax;
 
   return (
     <div className="space-y-6">
@@ -51,13 +58,13 @@ export default function OfferCompare() {
           state={offerA}
           onChange={setOfferA}
           result={a}
-          isWinner={a.afterTax === winnerNet}
+          badge={aHigher ? "higher" : tied ? "tied" : "none"}
         />
         <OfferCard
           state={offerB}
           onChange={setOfferB}
           result={b}
-          isWinner={b.afterTax === winnerNet}
+          badge={bHigher ? "higher" : tied ? "tied" : "none"}
         />
       </div>
 
@@ -104,61 +111,53 @@ function initialOffer(name: string): OfferState {
   };
 }
 
-type Result = {
-  cashTotal: number;
-  equityGross: number;
-  equityAfterDilution: number;
-  pretax: number;
-  afterTax: number;
-};
-
 function evaluate(
   o: OfferState,
   taxRate: number,
   ltcgRate: number,
   years: number,
-): Result {
-  const cashTotal = o.base * years + o.signing + o.bonus * years;
-  const equityGross =
-    o.equityType === "rsu"
-      ? o.sale * o.shares
-      : Math.max(0, o.sale - o.strike) * o.shares;
-  const equityAfterDilution = equityGross * Math.max(0, 1 - o.dilutionPct / 100);
-  const cashAfterTax = cashTotal * (1 - taxRate / 100);
-  const equityAfterTax =
-    o.equityType === "rsu"
-      ? // RSUs: full FMV at vest is ordinary income. Subsequent
-        // appreciation past vest only matters if shares are held, and
-        // a 4-year horizon at offer time is too rough to model that
-        // here. Treat as fully ordinary so the comparison doesn't
-        // overstate after-tax value.
-        equityAfterDilution * (1 - taxRate / 100)
-      : // Options: assume LTCG-eligible (qualified-disposition shape).
-        equityAfterDilution * (1 - ltcgRate / 100);
-  const pretax = cashTotal + equityAfterDilution;
-  const afterTax = cashAfterTax + equityAfterTax;
-  return { cashTotal, equityGross, equityAfterDilution, pretax, afterTax };
+): OfferOutcome {
+  return offerOutcome({
+    base: o.base,
+    signing: o.signing,
+    bonus: o.bonus,
+    equityType: o.equityType,
+    shares: o.shares,
+    strike: o.strike,
+    sale: o.sale,
+    dilutionPct: o.dilutionPct,
+    years,
+    ordinaryRate: taxRate,
+    ltcgRate,
+  });
 }
 
 function OfferCard({
   state,
   onChange,
   result,
-  isWinner,
+  badge,
 }: {
   state: OfferState;
   onChange: (next: OfferState) => void;
-  result: Result;
-  isWinner: boolean;
+  result: OfferOutcome;
+  badge: "higher" | "tied" | "none";
 }) {
   const update = <K extends keyof OfferState>(key: K, v: OfferState[K]) =>
     onChange({ ...state, [key]: v });
+
+  const borderColor =
+    badge === "higher"
+      ? "var(--accent)"
+      : badge === "tied"
+        ? "var(--amber)"
+        : "var(--line)";
 
   return (
     <div
       className="rounded-md border p-5"
       style={{
-        borderColor: isWinner ? "var(--accent)" : "var(--line)",
+        borderColor,
         background: "var(--surface)",
       }}
     >
@@ -170,13 +169,20 @@ function OfferCard({
           className="bg-transparent text-base font-medium"
           style={{ color: "var(--text)" }}
         />
-        {isWinner && (
+        {badge === "higher" && (
           <span
-            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap"
             style={{ background: "var(--accent-soft)", color: "var(--accent)" }}
-            title="This scenario has the higher modeled total. The model is intentionally simple. Real take-home depends on exercise timing, AMT, vest schedules, and many things this view does not capture."
           >
-            Higher in this model
+            Higher in this simplified model
+          </span>
+        )}
+        {badge === "tied" && (
+          <span
+            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap"
+            style={{ background: "var(--surface-alt)", color: "var(--amber)" }}
+          >
+            Tied in this model
           </span>
         )}
       </div>

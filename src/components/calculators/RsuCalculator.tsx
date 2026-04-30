@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CalcNumber, ResultRow, fmt } from "./CalcInput";
 import Abbr from "@/components/ui/Abbr";
 import type { Profile } from "@/lib/state/PortalContext";
+import { rsuOutcome } from "@/lib/tax";
 
 /**
  * RSU calculator. Math from spec/04-BUSINESS-LOGIC.md. Pre-fills from
@@ -19,13 +20,13 @@ export default function RsuCalculator({ profile }: { profile: Profile }) {
   const [tax, setTax] = useState(35);
   const [ltcg, setLtcg] = useState(15);
 
-  const vestValue = count * vp;
-  const taxAtVest = vestValue * (tax / 100);
-  const sharesReceived = Math.round(count * (1 - tax / 100));
-  const saleValue = sharesReceived * sp;
-  const gainAfterVest = Math.max(0, (sp - vp) * sharesReceived);
-  const ltcgTax = gainAfterVest * (ltcg / 100);
-  const net = saleValue - ltcgTax;
+  const outcome = rsuOutcome({
+    count,
+    vestPrice: vp,
+    salePrice: sp,
+    ordinaryRate: tax,
+    ltcgRate: ltcg,
+  });
 
   return (
     <div className="space-y-6">
@@ -60,15 +61,15 @@ export default function RsuCalculator({ profile }: { profile: Profile }) {
           cover withholding. You keep what is left.
         </p>
         <div className="mt-4">
-          <ResultRow label="Value at vest" value={fmt(vestValue)} hint="count × vest price" />
-          <ResultRow label="Tax withheld" value={fmt(taxAtVest)} tone="warning" />
+          <ResultRow label="Value at vest" value={fmt(outcome.valueAtVest)} hint="count × vest price" />
+          <ResultRow label="Tax withheld" value={fmt(outcome.taxWithheld)} tone="warning" />
           <ResultRow
             label="Shares delivered to you"
-            value={sharesReceived.toLocaleString()}
+            value={outcome.sharesDelivered.toLocaleString()}
             tone="accent"
           />
-          <ResultRow label="Sale value" value={fmt(saleValue)} />
-          <ResultRow label="Gain since vest" value={fmt(gainAfterVest)} hint="(sale − vest) × shares" />
+          <ResultRow label="Sale value" value={fmt(outcome.saleValue)} />
+          <ResultRow label="Gain since vest" value={fmt(outcome.gainAfterVest)} hint="(sale − vest) × shares" />
           <ResultRow
             label={
               <>
@@ -79,9 +80,9 @@ export default function RsuCalculator({ profile }: { profile: Profile }) {
                 tax (if held 1+ year)
               </>
             }
-            value={fmt(ltcgTax)}
+            value={fmt(outcome.ltcgTax)}
           />
-          <ResultRow label="Net proceeds" value={fmt(net)} tone="good" />
+          <ResultRow label="Net proceeds" value={fmt(outcome.net)} tone="good" />
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
 import { useId, useRef, useState } from "react";
 import { usePortal } from "@/lib/state/PortalContext";
 import type { PlanDoc } from "@/lib/state/PortalContext";
-import { GEMINI_MODEL } from "@/lib/gemini";
+import { GEMINI_MODEL, GEMINI_MODEL_NOTE } from "@/lib/gemini";
 import FaqBank from "./FaqBank";
 
 const SUGGESTED_DEFAULT = [
@@ -84,6 +84,12 @@ function PlanDocUpload() {
   const { planDoc, setPlanDoc } = usePortal();
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+  // Document upload defaults to OFF. The user has to affirmatively
+  // confirm their employer permits sending the document to a
+  // third-party AI before the file picker activates. Per the
+  // CFO/Legal review feedback, this prevents an "oops" upload from
+  // someone whose company policy quietly prohibits it.
+  const [policyConfirmed, setPolicyConfirmed] = useState(false);
 
   const onFile = async (f: File) => {
     setError(null);
@@ -183,30 +189,77 @@ function PlanDocUpload() {
         className="mt-2 text-sm"
         style={{ color: "var(--text-secondary)" }}
       >
-        PDF, .txt, or .md up to 8 MB. The document is read in your
-        browser, attached to the next request, and never stored on a
-        server.
+        Generic Q&amp;A is the default. The Ask tab works without an
+        upload. Attach a plan document only if you want answers grounded
+        in your actual paperwork. PDF, .txt, or .md up to 8 MB. The file
+        is read in your browser, attached to the next request, and
+        never stored on a server.
       </p>
-      <p
-        className="mt-2 text-xs"
-        style={{ color: "var(--amber)" }}
+      <div
+        className="mt-3 rounded-md border-l-4 p-3 text-xs leading-6"
+        style={{
+          borderColor: "var(--amber)",
+          borderLeftColor: "var(--amber)",
+          borderLeftWidth: 4,
+          background: "var(--surface-soft)",
+          color: "var(--text-secondary)",
+        }}
+        role="note"
       >
-        Google Gemini is a third-party AI provider. Some employers
-        prohibit sending plan documents to outside AI services, and
-        free-tier Gemini may use prompts to improve their models. Check
-        your company&rsquo;s policy before uploading.
-      </p>
+        <p
+          className="text-[11px] font-semibold uppercase tracking-[0.18em]"
+          style={{ color: "var(--amber)" }}
+        >
+          Before you upload
+        </p>
+        <p className="mt-1">
+          Google Gemini is a third-party AI provider. Many employers
+          prohibit sending plan documents, grant agreements, or
+          compensation data to outside AI services. Free-tier Gemini
+          may also use prompts to improve their models. Don&rsquo;t
+          upload unless your company&rsquo;s policy permits it.
+        </p>
+      </div>
+      <label
+        className="mt-3 flex items-start gap-2 text-sm"
+        style={{ color: "var(--text-secondary)" }}
+      >
+        <input
+          type="checkbox"
+          checked={policyConfirmed}
+          onChange={(e) => setPolicyConfirmed(e.target.checked)}
+          className="mt-1"
+        />
+        <span>
+          My company permits sending this document to Google Gemini for
+          analysis.
+        </span>
+      </label>
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
+        disabled={!policyConfirmed}
+        aria-disabled={!policyConfirmed}
         className="mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
         style={{
-          background: "var(--surface-alt)",
-          color: "var(--text)",
+          background: policyConfirmed
+            ? "var(--surface-alt)"
+            : "var(--surface-soft)",
+          color: policyConfirmed ? "var(--text)" : "var(--text-muted)",
+          cursor: policyConfirmed ? "pointer" : "not-allowed",
+          opacity: policyConfirmed ? 1 : 0.6,
         }}
       >
         Choose file
       </button>
+      {!policyConfirmed && (
+        <p
+          className="mt-2 text-[11px]"
+          style={{ color: "var(--text-muted)" }}
+        >
+          Confirm the policy checkbox above to enable file selection.
+        </p>
+      )}
       <input
         ref={inputRef}
         type="file"
@@ -214,7 +267,7 @@ function PlanDocUpload() {
         className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0];
-          if (f) onFile(f);
+          if (f && policyConfirmed) onFile(f);
           // Reset so the same file can be re-selected if needed.
           e.target.value = "";
         }}
@@ -261,10 +314,11 @@ function SettingsPanel() {
           {GEMINI_MODEL}
         </p>
         <p
-          className="mt-1 text-[11px]"
+          className="mt-1 text-[11px] leading-5"
           style={{ color: "var(--text-muted)" }}
         >
-          Free tier. Daily and per-minute limits apply.
+          {GEMINI_MODEL_NOTE} Free tier. Daily and per-minute limits
+          apply.
         </p>
       </div>
 

@@ -24,11 +24,26 @@ function grant(overrides: Partial<Grant> = {}): Grant {
 }
 
 describe("GEMINI_MODEL", () => {
-  it("does not point at a deprecated model family", () => {
-    // gemini-2.5-pro is on Google's deprecation calendar. Anchor the
-    // tool to a stable, non-deprecated free-tier model.
-    expect(GEMINI_MODEL).not.toBe("gemini-2.5-pro");
+  it("does not pin a deprecated 2.x chat model family", () => {
+    // The entire 2.x Gemini chat family is on Google's deprecation
+    // calendar (gemini-2.5-flash and gemini-2.5-pro both list a June
+    // 17 2026 shutdown). Pin a -latest alias or a 3.x+ model.
+    expect(GEMINI_MODEL).not.toMatch(/^gemini-2\.\d+-(flash|pro)/);
+    // gemini-pro alone (the 1.x label) is also retired.
+    expect(GEMINI_MODEL).not.toBe("gemini-pro");
+    // Sanity: it's still a Gemini model.
     expect(GEMINI_MODEL).toMatch(/^gemini-/);
+  });
+
+  it("uses a -latest alias or a 3.x+ generation as the anchor", () => {
+    // The two acceptable patterns: Google-maintained aliases that
+    // auto-route to the current stable family (e.g., gemini-flash-latest,
+    // gemini-pro-latest), or a major generation 3 or higher.
+    const isLatestAlias = /-latest$/.test(GEMINI_MODEL);
+    const isGen3Plus = /^gemini-(\d+)/.test(GEMINI_MODEL)
+      ? Number(GEMINI_MODEL.match(/^gemini-(\d+)/)![1]) >= 3
+      : false;
+    expect(isLatestAlias || isGen3Plus).toBe(true);
   });
 });
 

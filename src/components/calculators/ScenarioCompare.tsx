@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CalcNumber, ResultRow, fmt } from "./CalcInput";
 import Abbr from "@/components/ui/Abbr";
 import { usePortal, type Profile } from "@/lib/state/PortalContext";
+import { rankScenarios, type ScenarioOutcome } from "@/lib/tax";
 
 /**
  * Compare three exercise strategies for the user's first option grant:
@@ -34,45 +35,17 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
     return <EmptyOption hasGrants={profile.grants.length > 0} />;
   }
 
-  // Scenario 1: exercise now, sell at event. Floor LTCG and ordinary
-  // tax at zero so a sale below strike registers as no tax (a capital
-  // loss is a separate model that this view does not surface).
-  const s1Cash =
-    shares * strike +
-    (type === "nso" ? Math.max(0, (fmv - strike) * shares) * (tax / 100) : 0);
-  const s1TaxNow =
-    type === "iso" ? 0 : Math.max(0, (fmv - strike) * shares) * (tax / 100);
-  const s1TaxLater =
-    type === "iso"
-      ? Math.max(0, (ipo - strike) * shares) * (ltcg / 100)
-      : Math.max(0, (ipo - fmv) * shares) * (ltcg / 100);
-  const s1Amt = type === "iso" ? Math.max(0, (fmv - strike) * shares) : 0;
-  const s1Net = shares * ipo - shares * strike - s1TaxNow - s1TaxLater;
-
-  // Scenario 2: wait, cashless at event
-  const s2Cash = 0;
-  const s2TaxLater = Math.max(0, (ipo - strike) * shares) * (tax / 100);
-  const s2Amt = 0;
-  const s2Net = shares * ipo - shares * strike - s2TaxLater;
-
-  // Scenario 3: exercise 25% now
-  const q = shares * 0.25;
-  const r = shares * 0.75;
-  const s3Cash =
-    q * strike +
-    (type === "nso" ? Math.max(0, (fmv - strike) * q) * (tax / 100) : 0);
-  const s3TaxNow =
-    type === "iso" ? 0 : Math.max(0, (fmv - strike) * q) * (tax / 100);
-  const s3TaxLater =
-    (type === "iso"
-      ? Math.max(0, (ipo - strike) * q) * (ltcg / 100)
-      : Math.max(0, (ipo - fmv) * q) * (ltcg / 100)) +
-    Math.max(0, (ipo - strike) * r) * (tax / 100);
-  const s3Amt = type === "iso" ? Math.max(0, (fmv - strike) * q) : 0;
-  const s3Net = shares * ipo - shares * strike - s3TaxNow - s3TaxLater;
-
-  const winnerNet = Math.max(s1Net, s2Net, s3Net);
-  const anyAmt = type === "iso" && (s1Amt > 0 || s3Amt > 0);
+  const ranking = rankScenarios({
+    type,
+    shares,
+    strike,
+    fmv,
+    eventPrice: ipo,
+    ordinaryRate: tax,
+    ltcgRate: ltcg,
+  });
+  const { s1, s2, s3, highest } = ranking;
+  const anyAmt = type === "iso" && (s1.amtExposure > 0 || s3.amtExposure > 0);
 
   return (
     <div className="space-y-6">
@@ -128,29 +101,20 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
         <ScenarioCard
           title="Exercise now, sell at event"
           desc="Pay for shares + tax now. Sell at event."
-          cash={s1Cash}
-          amt={s1Amt}
-          totalTax={s1TaxNow + s1TaxLater}
-          net={s1Net}
-          isWinner={s1Net === winnerNet}
+          outcome={s1}
+          isWinner={highest === 1}
         />
         <ScenarioCard
           title="Wait, cashless at event"
           desc="No cash needed up front. All gain ordinary at event."
-          cash={s2Cash}
-          amt={s2Amt}
-          totalTax={s2TaxLater}
-          net={s2Net}
-          isWinner={s2Net === winnerNet}
+          outcome={s2}
+          isWinner={highest === 2}
         />
         <ScenarioCard
           title="Exercise 25% now, rest at event"
           desc="Partial cost now. 25% gets LTCG, 75% ordinary."
-          cash={s3Cash}
-          amt={s3Amt}
-          totalTax={s3TaxNow + s3TaxLater}
-          net={s3Net}
-          isWinner={s3Net === winnerNet}
+          outcome={s3}
+          isWinner={highest === 3}
         />
       </div>
 
@@ -174,20 +138,15 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
 function ScenarioCard({
   title,
   desc,
-  cash,
-  amt,
-  totalTax,
-  net,
+  outcome,
   isWinner,
 }: {
   title: string;
   desc: string;
-  cash: number;
-  amt: number;
-  totalTax: number;
-  net: number;
+  outcome: ScenarioOutcome;
   isWinner: boolean;
 }) {
+  const { cash, amtExposure: amt, totalTax, net } = outcome;
   return (
     <div
       className="rounded-md border p-5"
@@ -202,14 +161,13 @@ function ScenarioCard({
         </p>
         {isWinner && (
           <span
-            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap"
             style={{
               background: "var(--accent-soft)",
               color: "var(--accent)",
             }}
-            title="Highest net under the modeled assumptions. AMT timing is not included."
           >
-            Highest modeled net
+            Highest sale net (before AMT timing)
           </span>
         )}
       </div>

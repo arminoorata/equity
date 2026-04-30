@@ -33,16 +33,53 @@ imports removed (privacy posture per the spec).
 
 ## Hard constraints
 
-- **No backend.** Pure static SPA. Anthropic chat (Ask tab) calls
-  `api.anthropic.com` directly from the browser using the user's pasted
-  API key + `anthropic-dangerous-direct-browser-access: true`.
-- **No client analytics.** No `@vercel/analytics`, no `@vercel/speed-insights`.
-  Vercel's free request-level analytics is the only allowed source of usage data.
+- **No backend.** Pure static SPA. The Ask tab calls Google's Gemini
+  API (`generativelanguage.googleapis.com`) directly from the browser
+  using the user's pasted Google AI Studio key, sent as the
+  `x-goog-api-key` header. The key, the chat history, and any uploaded
+  plan document never touch a server we operate. Storage is
+  sessionStorage by default and localStorage only when the user opts
+  in.
+- **Model anchor.** Specific Gemini model is defined as a single
+  constant in `src/lib/gemini.ts` (`GEMINI_MODEL`). Google deprecates
+  models on a rolling cycle, so the constant is what changes when a
+  family is end-of-life. UI copy reads from the constant, never
+  hardcodes a name. The `gemini.test.ts` suite contains a guard that
+  fails if a deprecated 2.x family slips back in.
+- **No client analytics.** No `@vercel/analytics`, no
+  `@vercel/speed-insights`. Vercel's free request-level analytics is
+  the only allowed source of usage data.
+- **CSP.** `connect-src` is locked to `'self'` plus
+  `https://generativelanguage.googleapis.com`. No other outbound
+  origins. `frame-ancestors 'none'` blocks embedding.
+- **Document-upload privacy.** Plan-document upload defaults OFF.
+  Users must affirmatively check "my company permits sending this
+  document to Google Gemini" before the upload control activates.
 - **Voice rules.** Every line of copy passes the rules in
   `/srv/.claude/writing_rules.md`. No em dashes. No "let's dive in." No
   fake suspense. First person where natural.
-- **Sibling-pattern parity.** Header, footer, palette, type, theme behavior
-  must match FLSA / FAIR / SIGNS.
+- **Sibling-pattern parity.** Header, footer, palette, type, theme
+  behavior must match FLSA / FAIR / SIGNS.
+
+## Tests
+
+`npm test` runs vitest against pure-functional libs:
+
+- `src/lib/vesting.test.ts` covers cliff math, monthly increments,
+  share-total integrity, day-clamp on month rollover, status
+  derivation around the cliff date.
+- `src/lib/tax.test.ts` is the table-driven tax suite covering ISO
+  qualifying disposition, ISO disqualifying / same-year sale, AMT
+  exposure vs AMT owed, NSO exercise + sale, RSU withholding and
+  share delivery, OfferCompare assumptions, and ScenarioCompare
+  ranking.
+- `src/lib/gemini.test.ts` covers the model-deprecation guard,
+  system-prompt anti-injection rules, request-body assembly with
+  role mapping, PDF inline-data on first turn only, text-doc
+  BEGIN/END markers, and error mapping (401/429/blockReason).
+
+UI components import from `src/lib/tax.ts`. Don't reintroduce inline
+tax math in calculators.
 
 ## Build phases
 

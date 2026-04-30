@@ -6,16 +6,30 @@ import type { ChatMessage, Grant, PlanDoc } from "@/lib/state/PortalContext";
  * generativelanguage.googleapis.com directly with the key passed as
  * the x-goog-api-key header.
  *
- * Model: gemini-2.5-flash on the free tier. Flash is the right pick
- * for a public BYOK education tool because it has the highest free
- * daily quota and is not on Google's deprecation calendar. The pro
- * variant has been listed for shutdown, so anchor the tool to flash
- * and revisit when Google rolls a new stable family. The key, the
- * chat history, and any uploaded plan document never touch a server
- * we operate.
+ * Model anchor: gemini-flash-latest. Google maintains this alias to
+ * auto-route to the current stable Flash family model so a public BYOK
+ * tool doesn't have to chase deprecation dates. The 2.x specific names
+ * (gemini-2.5-flash, gemini-2.5-pro) are on Google's deprecation
+ * calendar with a June 17 2026 shutdown, so they should NOT be the
+ * pinned model. If Google ever retires the alias itself, swap to the
+ * fallback constant and update the test guard.
+ *
+ * The key, the chat history, and any uploaded plan document never
+ * touch a server we operate.
  */
 
-export const GEMINI_MODEL = "gemini-2.5-flash";
+export const GEMINI_MODEL = "gemini-flash-latest";
+
+// Fallback if the -latest alias is unavailable on the user's project.
+// Kept as a named constant so callers can switch with one edit and
+// the test suite knows what to enforce.
+export const GEMINI_FALLBACK_MODEL = "gemini-pro-latest";
+
+// Human-readable label for the model card. The free Gemini lineup
+// shifts frequently, so the UI shows the alias plus a "may change"
+// note rather than promising specific behavior.
+export const GEMINI_MODEL_NOTE =
+  "Google routes this to the current stable Gemini Flash model. The underlying model may change as Google updates their lineup.";
 
 const SYSTEM_PROMPT_BASE = `You are an equity compensation educator for a free public web tool built by Armi Noorata. Your readers are people trying to understand their own stock options, RSUs, or other equity grants. Some are getting their first grant. Some have been vesting for years. Treat them like adults who can handle real information without being condescended to.
 
