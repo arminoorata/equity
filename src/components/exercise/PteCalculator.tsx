@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CalcNumber, ResultRow, fmt } from "@/components/calculators/CalcInput";
+import Abbr from "@/components/ui/Abbr";
 import { usePortal } from "@/lib/state/PortalContext";
 import { deriveStatus } from "@/lib/vesting";
 
@@ -138,7 +139,7 @@ export default function PteCalculator() {
           width="180px"
         />
         <CalcNumber label="Strike" value={strike} onChange={setStrike} step={0.01} prefix="$" />
-        <CalcNumber label="FMV today" value={fmv} onChange={setFmv} step={1} prefix="$" />
+        <CalcNumber label="FMV today" value={fmv} onChange={setFmv} step={1} prefix="$" hint="Fair Market Value" />
         <CalcNumber
           label="Window"
           value={windowDays}
@@ -187,7 +188,15 @@ export default function PteCalculator() {
           />
           {type === "iso" && (
             <ResultRow
-              label="AMT exposure (separate)"
+              label={
+                <>
+                  <Abbr label="AMT" title="Alternative Minimum Tax">
+                    A parallel US tax that ISO exercises can trigger.
+                    The spread at exercise is added to AMT income.
+                  </Abbr>{" "}
+                  exposure (separate)
+                </>
+              }
               value={fmt(amt)}
               tone="warning"
               hint="may be owed at tax time, depends on your full picture"

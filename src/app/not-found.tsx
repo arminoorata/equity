@@ -21,7 +21,7 @@ export default function NotFound() {
           className="mt-5 text-base leading-7 md:text-lg"
           style={{ color: "var(--muted)" }}
         >
-          Either the URL is off, or we built something and unbuilt it.
+          Either the URL is off, or I built something and unbuilt it.
           Either way, here&rsquo;s a way back.
         </p>
         <div className="mt-10 flex flex-wrap gap-3">

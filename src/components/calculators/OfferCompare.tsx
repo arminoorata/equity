@@ -43,7 +43,7 @@ export default function OfferCompare() {
           step={1}
         />
         <CalcNumber label="Tax rate" value={tax} onChange={setTax} step={1} suffix="%" max={100} />
-        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} />
+        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} hint="long-term cap. gains" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

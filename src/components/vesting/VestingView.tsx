@@ -10,6 +10,7 @@ import {
   type VestEvent,
 } from "@/lib/vesting";
 import VestingEmptyState from "./VestingEmptyState";
+import SharedNumberInput from "@/components/learn/widgets/NumberInput";
 
 type SubView = "schedule" | "lifecycle";
 
@@ -858,49 +859,26 @@ function SummaryCard({
   );
 }
 
-function NumberInput({
-  label,
-  value,
-  onChange,
-  prefix,
-  step = 1,
-}: {
+function NumberInput(props: {
   label: string;
   value: number;
   onChange: (n: number) => void;
   prefix?: string;
   step?: number;
 }) {
+  // Delegate to the shared comma-formatted input so the lifecycle
+  // FMV / event-price fields show thousand separators like everywhere
+  // else in the calculators.
   return (
-    <label className="flex flex-col gap-1.5">
-      <span
-        className="text-[11px] font-medium uppercase tracking-[0.14em]"
-        style={{ color: "var(--text-muted)" }}
-      >
-        {label}
-      </span>
-      <span
-        className="inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5"
-        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
-      >
-        {prefix && (
-          <span style={{ color: "var(--text-muted)" }} className="text-sm">
-            {prefix}
-          </span>
-        )}
-        <input
-          type="number"
-          value={value}
-          step={step}
-          onChange={(e) => {
-            const next = Number(e.target.value);
-            if (Number.isFinite(next)) onChange(Math.max(0, next));
-          }}
-          className="mono w-24 bg-transparent text-[14px]"
-          style={{ color: "var(--text)" }}
-        />
-      </span>
-    </label>
+    <SharedNumberInput
+      label={props.label}
+      value={props.value}
+      onChange={props.onChange}
+      prefix={props.prefix}
+      step={props.step ?? 1}
+      min={0}
+      width="160px"
+    />
   );
 }
 

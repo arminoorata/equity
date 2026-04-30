@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   defaultGrant,
   usePortal,
@@ -468,7 +468,7 @@ function NumberField({
   onChange,
   min,
   max,
-  step,
+  step = 1,
   prefix,
 }: {
   value: number;
@@ -478,6 +478,22 @@ function NumberField({
   step?: number;
   prefix?: string;
 }) {
+  const allowDecimal = step < 1;
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [display, setDisplay] = useState(() =>
+    formatDisplay(value, allowDecimal),
+  );
+
+  useEffect(() => {
+    if (display === "") return;
+    const parsed = parseClean(display);
+    if (parsed === null) return;
+    if (parsed !== value) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDisplay(formatDisplay(value, allowDecimal));
+    }
+  }, [value, allowDecimal, display]);
+
   return (
     <span
       className="inline-flex w-full items-center gap-2 rounded-md border px-2.5 py-1.5"
@@ -489,26 +505,105 @@ function NumberField({
         </span>
       )}
       <input
-        type="number"
-        value={value}
-        min={min}
-        max={max}
-        step={step}
+        ref={inputRef}
+        type="text"
+        inputMode={allowDecimal ? "decimal" : "numeric"}
+        value={display}
         onChange={(e) => {
-          const next = Number(e.target.value);
-          if (Number.isFinite(next)) {
+          const input = e.target as HTMLInputElement;
+          const raw = input.value;
+          const cursor = input.selectionStart ?? raw.length;
+          const digitsBefore = countDigitsBefore(raw, cursor);
+
+          const reformatted = reformat(raw, allowDecimal);
+          setDisplay(reformatted);
+
+          const parsed = parseClean(reformatted);
+          if (parsed !== null && Number.isFinite(parsed)) {
             const clamped = Math.min(
               max ?? Number.POSITIVE_INFINITY,
-              Math.max(min ?? Number.NEGATIVE_INFINITY, next),
+              Math.max(min ?? Number.NEGATIVE_INFINITY, parsed),
             );
-            onChange(clamped);
+            if (clamped !== value) onChange(clamped);
           }
+
+          requestAnimationFrame(() => {
+            const node = inputRef.current;
+            if (!node) return;
+            const next = positionForDigitsBefore(reformatted, digitsBefore);
+            try {
+              node.setSelectionRange(next, next);
+            } catch {
+              // ignore
+            }
+          });
+        }}
+        onBlur={() => {
+          setDisplay(formatDisplay(value, allowDecimal));
         }}
         className="mono w-full bg-transparent text-[14px]"
         style={{ color: "var(--text)" }}
       />
     </span>
   );
+}
+
+function formatDisplay(n: number, allowDecimal: boolean): string {
+  if (!Number.isFinite(n)) return "";
+  if (allowDecimal) {
+    return n.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 6,
+    });
+  }
+  return Math.round(n).toLocaleString("en-US");
+}
+
+function reformat(raw: string, allowDecimal: boolean): string {
+  const cleaned = allowDecimal
+    ? raw.replace(/[^\d.]/g, "")
+    : raw.replace(/[^\d]/g, "");
+  if (cleaned === "") return "";
+  if (allowDecimal) {
+    const firstDot = cleaned.indexOf(".");
+    let intPart: string;
+    let decPart: string | undefined;
+    if (firstDot === -1) {
+      intPart = cleaned;
+      decPart = undefined;
+    } else {
+      intPart = cleaned.slice(0, firstDot);
+      decPart = cleaned.slice(firstDot + 1).replace(/\./g, "");
+    }
+    const intFormatted =
+      intPart === "" ? "" : Number(intPart).toLocaleString("en-US");
+    return decPart !== undefined ? `${intFormatted}.${decPart}` : intFormatted;
+  }
+  return Number(cleaned).toLocaleString("en-US");
+}
+
+function parseClean(s: string): number | null {
+  const cleaned = s.replace(/,/g, "");
+  if (cleaned === "" || cleaned === ".") return null;
+  const num = Number(cleaned);
+  return Number.isFinite(num) ? num : null;
+}
+
+function countDigitsBefore(text: string, cursor: number): number {
+  let count = 0;
+  for (let i = 0; i < cursor && i < text.length; i++) {
+    if (/[0-9.]/.test(text[i])) count++;
+  }
+  return count;
+}
+
+function positionForDigitsBefore(text: string, digitsBefore: number): number {
+  let count = 0;
+  for (let i = 0; i < text.length; i++) {
+    if (count === digitsBefore) return i;
+    if (/[0-9.]/.test(text[i])) count++;
+  }
+  return text.length;
 }
 
 function DateField({
@@ -528,7 +623,10 @@ function DateField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="mono w-full bg-transparent text-[14px]"
-        style={{ color: "var(--text)" }}
+        // colorScheme keeps the native date picker (calendar popup,
+        // year/month dropdowns) styled to match light/dark theme so
+        // the icon and dropdown text don't disappear in dark mode.
+        style={{ color: "var(--text)", colorScheme: "light dark" }}
       />
     </span>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CalcNumber, ResultRow, fmt } from "./CalcInput";
+import Abbr from "@/components/ui/Abbr";
 import type { Profile } from "@/lib/state/PortalContext";
 
 /**
@@ -44,18 +45,59 @@ export default function OptionsCalculator({ profile }: { profile: Profile }) {
       <div className="flex flex-wrap gap-4">
         <CalcNumber label="Shares" value={shares} onChange={setShares} step={100} />
         <CalcNumber label="Strike" value={strike} onChange={setStrike} step={0.01} prefix="$" />
-        <CalcNumber label="FMV" value={fmv} onChange={setFmv} step={1} prefix="$" />
+        <CalcNumber label="FMV" value={fmv} onChange={setFmv} step={1} prefix="$" hint="Fair Market Value" />
         <CalcNumber label="Sale price" value={sale} onChange={setSale} step={1} prefix="$" />
-        <CalcNumber label="Tax rate" value={tax} onChange={setTax} step={1} suffix="%" max={100} />
-        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} />
+        <CalcNumber label="Tax rate" value={tax} onChange={setTax} step={1} suffix="%" max={100} hint="ordinary income rate" />
+        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} hint="long-term cap. gains" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Card title="ISO" subtitle="Qualifying disposition (held 1y past exercise + 2y past grant)">
           <ResultRow label="Exercise cost" value={fmt(cost)} hint="shares × strike" />
-          <ResultRow label="Spread at exercise" value={fmt(Math.max(0, spread))} hint="(FMV − strike) × shares" />
-          <ResultRow label="AMT exposure" value={fmt(Math.max(0, spread))} tone="warning" hint="separate from regular tax" />
-          <ResultRow label="Tax at sale (LTCG)" value={fmt(isoTaxAtSale)} />
+          <ResultRow
+            label="Spread at exercise"
+            value={fmt(Math.max(0, spread))}
+            hint={
+              <>
+                (
+                <Abbr
+                  label="FMV"
+                  title="Fair Market Value"
+                >
+                  Per-share value. At public companies, the trading
+                  price. At private companies, the most recent 409A.
+                </Abbr>{" "}
+                − strike) × shares
+              </>
+            }
+          />
+          <ResultRow
+            label={
+              <>
+                <Abbr label="AMT" title="Alternative Minimum Tax">
+                  A parallel US tax that ISO exercises can trigger.
+                  The spread at exercise is added to AMT income.
+                </Abbr>{" "}
+                exposure
+              </>
+            }
+            value={fmt(Math.max(0, spread))}
+            tone="warning"
+            hint="separate from regular tax"
+          />
+          <ResultRow
+            label={
+              <>
+                Tax at sale (
+                <Abbr label="LTCG" title="Long-Term Capital Gains">
+                  The tax rate on assets held more than one year.
+                  Lower than ordinary income rates.
+                </Abbr>
+                )
+              </>
+            }
+            value={fmt(isoTaxAtSale)}
+          />
           <ResultRow label="Net proceeds" value={fmt(isoNet)} tone="good" />
         </Card>
 
@@ -64,7 +106,19 @@ export default function OptionsCalculator({ profile }: { profile: Profile }) {
           <ResultRow label="Spread at exercise" value={fmt(Math.max(0, spread))} />
           <ResultRow label="Tax at exercise" value={fmt(nsoTaxAtExercise)} tone="warning" hint="ordinary income on the spread" />
           <ResultRow label="Additional gain at sale" value={fmt(nsoAdditional)} />
-          <ResultRow label="Tax at sale (LTCG)" value={fmt(nsoTaxAtSale)} />
+          <ResultRow
+            label={
+              <>
+                Tax at sale (
+                <Abbr label="LTCG" title="Long-Term Capital Gains">
+                  The tax rate on assets held more than one year.
+                  Lower than ordinary income rates.
+                </Abbr>
+                )
+              </>
+            }
+            value={fmt(nsoTaxAtSale)}
+          />
           <ResultRow label="Net proceeds" value={fmt(nsoNet)} tone="good" />
         </Card>
       </div>

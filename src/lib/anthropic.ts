@@ -242,7 +242,7 @@ export async function sendChat({
     return {
       ok: false,
       kind: "server",
-      message: "Anthropic returned a response we couldn't parse.",
+      message: "Anthropic returned a response I couldn't parse.",
     };
   }
 

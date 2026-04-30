@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CalcNumber, ResultRow, fmt } from "./CalcInput";
+import Abbr from "@/components/ui/Abbr";
 import type { Profile } from "@/lib/state/PortalContext";
 
 /**
@@ -32,8 +33,8 @@ export default function RsuCalculator({ profile }: { profile: Profile }) {
         <CalcNumber label="RSU count" value={count} onChange={setCount} step={10} />
         <CalcNumber label="Vest price" value={vp} onChange={setVp} step={1} prefix="$" />
         <CalcNumber label="Sale price" value={sp} onChange={setSp} step={1} prefix="$" />
-        <CalcNumber label="Tax rate" value={tax} onChange={setTax} step={1} suffix="%" max={100} />
-        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} />
+        <CalcNumber label="Tax rate" value={tax} onChange={setTax} step={1} suffix="%" max={100} hint="ordinary income rate" />
+        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} hint="long-term cap. gains" />
       </div>
 
       <div
@@ -50,8 +51,13 @@ export default function RsuCalculator({ profile }: { profile: Profile }) {
           className="mt-1 text-xs"
           style={{ color: "var(--text-muted)" }}
         >
-          Full FMV at settlement is ordinary income. The company sells
-          shares to cover withholding. You keep what is left.
+          Full{" "}
+          <Abbr label="FMV" title="Fair Market Value">
+            Per-share value. At public companies, the trading price.
+            At private companies, the most recent 409A.
+          </Abbr>{" "}
+          at settlement is ordinary income. The company sells shares to
+          cover withholding. You keep what is left.
         </p>
         <div className="mt-4">
           <ResultRow label="Value at vest" value={fmt(vestValue)} hint="count × vest price" />
@@ -63,7 +69,18 @@ export default function RsuCalculator({ profile }: { profile: Profile }) {
           />
           <ResultRow label="Sale value" value={fmt(saleValue)} />
           <ResultRow label="Gain since vest" value={fmt(gainAfterVest)} hint="(sale − vest) × shares" />
-          <ResultRow label="LTCG tax (if held 1+ year)" value={fmt(ltcgTax)} />
+          <ResultRow
+            label={
+              <>
+                <Abbr label="LTCG" title="Long-Term Capital Gains">
+                  The tax rate on assets held more than one year.
+                  Lower than ordinary income rates.
+                </Abbr>{" "}
+                tax (if held 1+ year)
+              </>
+            }
+            value={fmt(ltcgTax)}
+          />
           <ResultRow label="Net proceeds" value={fmt(net)} tone="good" />
         </div>
       </div>

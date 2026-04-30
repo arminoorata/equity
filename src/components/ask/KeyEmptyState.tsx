@@ -170,11 +170,11 @@ export default function KeyEmptyState() {
       >
         <li>
           <span style={{ color: "var(--text-secondary)" }}>Your key:</span>{" "}
-          stays in this browser. We don&rsquo;t see it.
+          stays in this browser. I never see it.
         </li>
         <li>
           <span style={{ color: "var(--text-secondary)" }}>Your messages:</span>{" "}
-          go straight from your browser to Anthropic. We don&rsquo;t log them.
+          go straight from your browser to Anthropic. I don&rsquo;t log them.
         </li>
         <li>
           <span style={{ color: "var(--text-secondary)" }}>Your plan document:</span>{" "}

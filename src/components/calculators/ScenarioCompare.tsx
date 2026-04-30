@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CalcNumber, ResultRow, fmt } from "./CalcInput";
+import Abbr from "@/components/ui/Abbr";
 import { usePortal, type Profile } from "@/lib/state/PortalContext";
 
 /**
@@ -77,7 +78,7 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
       <div className="flex flex-wrap gap-4">
         <CalcNumber label="Shares" value={shares} onChange={setShares} step={100} />
         <CalcNumber label="Strike" value={strike} onChange={setStrike} step={0.01} prefix="$" />
-        <CalcNumber label="FMV today" value={fmv} onChange={setFmv} step={1} prefix="$" />
+        <CalcNumber label="FMV today" value={fmv} onChange={setFmv} step={1} prefix="$" hint="Fair Market Value" />
         <CalcNumber
           label={`Estimated ${eventLabel}`}
           value={ipo}
@@ -86,8 +87,8 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
           prefix="$"
           width="220px"
         />
-        <CalcNumber label="Tax rate" value={tax} onChange={setTax} step={1} suffix="%" max={100} />
-        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} />
+        <CalcNumber label="Tax rate" value={tax} onChange={setTax} step={1} suffix="%" max={100} hint="ordinary income rate" />
+        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} hint="long-term cap. gains" />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -205,7 +206,20 @@ function ScenarioCard({
       <div className="mt-4">
         <ResultRow label="Cash needed up front" value={fmt(cash)} tone="warning" />
         {amt > 0 && (
-          <ResultRow label="AMT exposure (ISO)" value={fmt(amt)} tone="warning" hint="separate from regular tax" />
+          <ResultRow
+            label={
+              <>
+                <Abbr label="AMT" title="Alternative Minimum Tax">
+                  A parallel US tax that ISO exercises can trigger.
+                  The spread at exercise is added to AMT income.
+                </Abbr>{" "}
+                exposure (ISO)
+              </>
+            }
+            value={fmt(amt)}
+            tone="warning"
+            hint="separate from regular tax"
+          />
         )}
         <ResultRow label="Total tax" value={fmt(totalTax)} />
         <ResultRow label="Net proceeds" value={fmt(net)} tone="good" />
