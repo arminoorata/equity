@@ -1,14 +1,36 @@
 /**
- * Glossary content. Verbatim from spec/05-CONTENT.md. Alphabetically
- * ordered. Slugs are derived for in-page anchors so individual terms
- * are deep-linkable (e.g. /glossary#amt).
+ * Glossary content. Definitions verbatim from spec/05-CONTENT.md.
+ * Alphabetically ordered. Slugs are derived for in-page anchors so
+ * individual terms are deep-linkable (e.g. /glossary#amt). The
+ * category field powers the small chip on each glossary card and is
+ * not part of the definition itself.
  */
+
+export type GlossaryCategory =
+  | "Tax"
+  | "Options"
+  | "RSUs"
+  | "Vesting"
+  | "Liquidity"
+  | "Company Stock"
+  | "Process";
 
 export type GlossaryEntry = {
   term: string;
   slug: string;
   definition: string;
+  category: GlossaryCategory;
 };
+
+export const GLOSSARY_CATEGORIES: GlossaryCategory[] = [
+  "Tax",
+  "Options",
+  "RSUs",
+  "Vesting",
+  "Liquidity",
+  "Company Stock",
+  "Process",
+];
 
 function slugify(term: string): string {
   return term
@@ -19,147 +41,184 @@ function slugify(term: string): string {
     .replace(/\s+/g, "-");
 }
 
-const entries: Array<[string, string]> = [
+const entries: Array<[string, string, GlossaryCategory]> = [
   [
     "83(b) Election",
     "A US tax filing made within 30 days of exercising unvested options or receiving restricted stock. Lets you be taxed on today's (usually low) value instead of at vesting. No extensions on the 30-day deadline. Talk to a tax advisor before filing.",
+    "Tax",
   ],
   [
     "409A Valuation",
     "An independent appraisal of a private company's fair market value, used to set strike prices for new option grants. Required by the IRS. The 409A is a tax number. Actual market prices can differ meaningfully.",
+    "Company Stock",
   ],
   [
     "AMT (Alternative Minimum Tax)",
     "A parallel US tax calculation that can be triggered by exercising ISOs. The spread at exercise is added to AMT income. May or may not result in actual AMT owed depending on your full tax picture.",
+    "Tax",
   ],
   [
     "Capital Gains",
     "Profit from selling an asset. Short-term (held <1 year) is taxed as ordinary income. Long-term (held >1 year) is taxed at lower rates.",
+    "Tax",
   ],
   [
     "Cashless Exercise",
     "Exercising options and immediately selling enough shares to cover the cost. Requires a liquid market, so generally only available post-IPO.",
+    "Options",
   ],
   [
     "Cliff",
     "A minimum service period before any of your equity vests. Commonly 12 months for new-hire grants and 6 months for refreshers. Companies use other shapes too.",
+    "Vesting",
   ],
   [
     "Common Stock",
     "Shares granted to employees. Junior to preferred stock in liquidation, which means investors get paid first.",
+    "Company Stock",
   ],
   [
     "Dilution",
     "When a company issues new shares, existing ownership percentages shrink. Normal at growing companies.",
+    "Company Stock",
   ],
   [
     "Disqualifying Disposition",
     "Selling ISO shares before meeting both holding periods (1 year post-exercise + 2 years post-grant). If the sale produced a gain, ordinary income is the smaller of the spread at exercise or the realized gain, with anything above that treated as capital gain. A loss is a capital loss with no ordinary-income portion.",
+    "Tax",
   ],
   [
     "Double Trigger Vesting",
     "An RSU mechanism at private companies: shares deliver only after both time vesting AND a liquidity event (acquisition, merger, or some number of days post-IPO).",
+    "RSUs",
   ],
   [
     "Early Exercise",
     "Exercising options before they vest. Often paired with an 83(b) election. Requires that the company allow it. Many don't.",
+    "Options",
   ],
   [
     "Exercise",
     "Buying shares at the strike price specified in your grant.",
+    "Options",
   ],
   [
     "Exercise Window (Post-Termination)",
     "The period after you leave a company during which you can still exercise vested options. Historical default is 90 days. Some companies offer longer windows now. Check your plan document.",
+    "Process",
   ],
   [
     "Fair Market Value (FMV)",
     "Current per-share value. At public companies, the trading price. At private companies, the most recent 409A valuation.",
+    "Company Stock",
   ],
   [
     "Grant Date",
     "The date your equity award was officially approved and issued. Often different from your vesting start date.",
+    "Process",
   ],
   [
     "Grant Letter",
     "The legal document describing your specific grant. Contains the terms that actually apply to you. Read it.",
+    "Process",
   ],
   [
     "ISOs (Incentive Stock Options)",
     "US-only option type with friendlier tax treatment than NSOs if you meet specific holding-period rules. AMT applies. Available only to employees.",
+    "Options",
   ],
   [
     "IPO",
     "Initial Public Offering. The company starts trading on a public exchange. Often a trigger for RSU settlement at private companies.",
+    "Liquidity",
   ],
   [
     "Liquidation Preference",
     "The order and amount in which different classes of stockholders get paid in an acquisition or wind-down. Investors typically have it. Common stockholders typically don't.",
+    "Company Stock",
   ],
   [
     "Lock-up Period",
     "A post-IPO restriction on insiders selling shares. Typically 90–180 days, sometimes longer.",
+    "Liquidity",
   ],
   [
     "LTCG (Long-Term Capital Gains)",
     "The tax rate applied to gains on assets held more than one year. Lower than ordinary income rates.",
+    "Tax",
   ],
   [
     "NSOs (Non-Qualified Stock Options)",
     "Stock options taxed as ordinary income at exercise on the spread between FMV and strike. Available to employees, directors, and contractors.",
+    "Options",
   ],
   [
     "Ordinary Income",
     "Income taxed at regular rates (like salary). Applies to NSO spread at exercise and full FMV at RSU settlement.",
+    "Tax",
   ],
   [
     "Plan Document",
     "The legal document governing all grants under a company's equity plan. Different from your grant letter, which is your specific terms. Both matter.",
+    "Process",
   ],
   [
     "Preferred Stock",
     "Shares held by investors with rights senior to common (priority in liquidation, sometimes board control, etc.).",
+    "Company Stock",
   ],
   [
     "QSBS (Qualified Small Business Stock)",
     "US Section 1202 of the tax code. For shares acquired after July 4, 2025: 50% exclusion at 3-year hold, 75% at 4 years, 100% at 5 years, with a per-issuer cap of the greater of $15M (indexed) or 10x basis. Shares acquired after September 27, 2010 and on or before July 4, 2025 keep the 100%-at-5-years rule with a $10M cap. Shares acquired on or before September 27, 2010 have lower exclusion percentages (50% or 75%) and trigger an AMT preference on the excluded portion. Eligibility rules are specific.",
+    "Tax",
   ],
   [
     "Qualifying Disposition",
     "Selling ISO shares after holding them at least 1 year post-exercise AND 2 years post-grant. The whole gain from strike to sale gets long-term capital-gains treatment.",
+    "Tax",
   ],
   [
     "RSU (Restricted Stock Unit)",
     "A promise of future shares at no cost. Single trigger at public companies (time vesting). Double trigger at private companies (time vesting + liquidity event).",
+    "RSUs",
   ],
   [
     "Spread",
     "FMV minus strike price. Your unrealized gain per share at exercise.",
+    "Options",
   ],
   [
     "Strike Price",
     "The fixed price you pay per share when exercising an option. Set at the FMV on the grant date.",
+    "Options",
   ],
   [
     "Tax Withholding",
     "The portion of your equity income the company holds back to cover taxes. For RSUs, usually done by selling enough of your shares at vest.",
+    "Tax",
   ],
   [
     "Tender Offer",
     "A company-organized opportunity for employees and early investors to sell shares before an IPO, at an agreed price. Voluntary and limited.",
+    "Liquidity",
   ],
   [
     "Vesting",
     "Earning your equity over time according to a schedule. Until shares vest, you don't have rights to them.",
+    "Vesting",
   ],
   [
     "Vesting Start Date",
     "The date your vesting clock begins. May or may not match your grant date. The vesting schedule runs from this date.",
+    "Vesting",
   ],
 ];
 
-export const glossary: GlossaryEntry[] = entries.map(([term, definition]) => ({
-  term,
-  slug: slugify(term),
-  definition,
-}));
+export const glossary: GlossaryEntry[] = entries.map(
+  ([term, definition, category]) => ({
+    term,
+    slug: slugify(term),
+    definition,
+    category,
+  }),
+);

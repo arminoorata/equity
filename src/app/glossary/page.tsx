@@ -1,4 +1,5 @@
 import { glossary } from "@/data/glossary";
+import GlossaryClient from "@/components/glossary/GlossaryClient";
 
 export const metadata = {
   title: "Glossary",
@@ -7,14 +8,15 @@ export const metadata = {
 };
 
 /**
- * Glossary tab. Alphabetised list of ~34 terms. Each term has a stable
- * slug used as its anchor id, so individual definitions are
- * deep-linkable (e.g. /glossary#amt). Content is verbatim from the
- * spec; structure is a definition list (<dl>) for accessibility.
+ * Glossary tab. The interactive surface lives in GlossaryClient
+ * (search, A-Z jump row, category filter, two-column cards). The page
+ * itself just renders the eyebrow, heading, intro, and the client
+ * component. Each term still has a stable slug used as its anchor id,
+ * so individual definitions remain deep-linkable (e.g. /glossary#amt).
  */
 export default function GlossaryPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12 md:px-10 md:py-16">
+    <main className="mx-auto max-w-5xl px-6 py-12 md:px-10 md:py-16">
       <p
         className="text-xs font-medium uppercase tracking-[0.32em]"
         style={{ color: "var(--accent)" }}
@@ -25,48 +27,18 @@ export default function GlossaryPage() {
         The terms, in plain English.
       </h1>
       <p
-        className="mt-4 text-base leading-7"
-        style={{ color: "var(--muted)" }}
+        className="mt-4 max-w-2xl text-base leading-7"
+        style={{ color: "var(--text-secondary)" }}
       >
-        About thirty-five terms you will run into when reading anything about
-        equity. No company-specific jargon. Each term is deep-linkable, so
-        you can share a single definition by URL.
+        About thirty-five terms you will run into when reading anything
+        about equity. Search for a specific one, jump by letter, or
+        filter by category. Each term is deep-linkable, so you can share
+        a single definition by URL.
       </p>
 
-      <dl className="mt-12">
-        {glossary.map((entry, index) => (
-          <div
-            key={entry.slug}
-            id={entry.slug}
-            className="scroll-mt-24"
-            style={{
-              borderTop:
-                index === 0 ? undefined : "1px solid var(--line)",
-              paddingTop: index === 0 ? 0 : "1.25rem",
-              paddingBottom: "1.25rem",
-            }}
-          >
-            <dt
-              className="text-base font-semibold"
-              style={{ color: "var(--text)" }}
-            >
-              <a
-                href={`#${entry.slug}`}
-                className="hover:underline underline-offset-4"
-                style={{ color: "inherit" }}
-              >
-                {entry.term}
-              </a>
-            </dt>
-            <dd
-              className="mt-1.5 text-[15px] leading-7"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              {entry.definition}
-            </dd>
-          </div>
-        ))}
-      </dl>
+      <div className="mt-10">
+        <GlossaryClient entries={glossary} />
+      </div>
 
       <p
         className="mt-12 rounded-md border px-4 py-3 text-xs italic leading-6"
