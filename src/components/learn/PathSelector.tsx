@@ -17,6 +17,14 @@ const options: Array<{ id: GrantType; label: string; icon: string }> = [
   { id: "unsure", label: "Not sure", icon: "🤔" },
 ];
 
+const featuredByGrant: Record<GrantType, string | null> = {
+  iso: "isos",
+  nso: "nsos",
+  rsu: "rsus",
+  mix: "basics",
+  unsure: "basics",
+};
+
 /**
  * "What do you have?" selector that re-orders the module grid based
  * on the grant type the user selects. State is local to this
@@ -90,7 +98,10 @@ export default function PathSelector({
       )}
 
       <div className="mt-8">
-        <LearnModuleGrid modules={orderedModules} />
+        <LearnModuleGrid
+          modules={orderedModules}
+          featuredModuleId={selected ? featuredByGrant[selected] : null}
+        />
       </div>
     </section>
   );

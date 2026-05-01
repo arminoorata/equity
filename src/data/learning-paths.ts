@@ -13,9 +13,9 @@ export type GrantType = "iso" | "nso" | "rsu" | "mix" | "unsure";
 const allIds = modules.map((m) => m.id);
 
 export const learningPaths: Record<GrantType, string[]> = {
-  iso: ["basics", "isos", "tax", "leaving", "liquidity", "case-study", "nsos", "rsus"],
-  nso: ["basics", "nsos", "tax", "leaving", "liquidity", "case-study", "isos", "rsus"],
-  rsu: ["basics", "rsus", "tax", "liquidity", "leaving", "case-study", "isos", "nsos"],
+  iso: ["isos", "basics", "tax", "leaving", "liquidity", "case-study", "nsos", "rsus"],
+  nso: ["nsos", "basics", "tax", "leaving", "liquidity", "case-study", "isos", "rsus"],
+  rsu: ["rsus", "basics", "tax", "liquidity", "leaving", "case-study", "isos", "nsos"],
   mix: ["basics", "isos", "nsos", "rsus", "tax", "leaving", "liquidity", "case-study"],
   unsure: allIds,
 };
