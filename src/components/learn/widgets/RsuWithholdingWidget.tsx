@@ -43,13 +43,13 @@ export default function RsuWithholdingWidget() {
           width="140px"
         />
         <NumberInput
-          label="Vest price"
+          label="Price per share at vest"
           value={vestPrice}
           onChange={setVestPrice}
           min={0}
           step={1}
           prefix="$"
-          width="130px"
+          width="180px"
         />
         <NumberInput
           label="Withholding rate"
@@ -101,7 +101,7 @@ export default function RsuWithholdingWidget() {
           label="Gross income at settlement"
           value={`$${grossIncome.toLocaleString()}`}
           tone="warning"
-          hint="count × vest price"
+          hint="count × price per share at vest"
         />
         <WidgetResult
           label="Tax withheld (approx.)"

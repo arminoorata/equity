@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import FieldInfo from "@/components/ui/FieldInfo";
 
 /**
  * Shared inputs for the calculator sub-views. The number input
@@ -20,6 +21,8 @@ export function CalcNumber({
   suffix,
   width = "150px",
   hint,
+  info,
+  infoTitle,
 }: {
   label: string;
   value: number;
@@ -31,6 +34,10 @@ export function CalcNumber({
   suffix?: string;
   width?: string;
   hint?: string;
+  /** Body explanation for the info popover. When set, renders an "i" icon next to the label. */
+  info?: ReactNode;
+  /** Override popover headline. Defaults to the field label. */
+  infoTitle?: string;
 }) {
   const allowDecimal = step < 1;
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -58,10 +65,13 @@ export function CalcNumber({
   return (
     <label className="flex flex-col gap-1.5" style={{ width }}>
       <span
-        className="text-[11px] font-medium uppercase tracking-[0.14em]"
+        className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.14em]"
         style={{ color: "var(--text-muted)" }}
       >
-        {label}
+        <span>{label}</span>
+        {info && (
+          <FieldInfo title={infoTitle ?? label}>{info}</FieldInfo>
+        )}
       </span>
       <span
         className="inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5"

@@ -31,11 +31,50 @@ export default function RsuCalculator({ profile }: { profile: Profile }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-4">
-        <CalcNumber label="RSU count" value={count} onChange={setCount} step={10} />
-        <CalcNumber label="Vest price" value={vp} onChange={setVp} step={1} prefix="$" />
-        <CalcNumber label="Sale price" value={sp} onChange={setSp} step={1} prefix="$" />
-        <CalcNumber label="Tax rate" value={tax} onChange={setTax} step={1} suffix="%" max={100} hint="ordinary income rate" />
-        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} hint="long-term cap. gains" />
+        <CalcNumber
+          label="RSU count"
+          value={count}
+          onChange={setCount}
+          step={10}
+          info="The number of restricted stock units in this grant. RSUs become real shares only when they vest."
+        />
+        <CalcNumber
+          label="Price per share at vest"
+          value={vp}
+          onChange={setVp}
+          step={1}
+          prefix="$"
+          width="200px"
+          info="The per-share price of the stock on the day your RSUs vest. For public companies, that's the trading price that day. For private companies, it's the most recent 409A valuation. Your employer reports this number on the vest event; the IRS uses it to calculate the ordinary income tax owed on the vest."
+        />
+        <CalcNumber
+          label="Sale price"
+          value={sp}
+          onChange={setSp}
+          step={1}
+          prefix="$"
+          info="What you sell each share for, after vest. For public companies, your real-world or expected sale price. For private companies before liquidity, your best guess at the future sale price (tender, secondary, IPO, or acquisition)."
+        />
+        <CalcNumber
+          label="Tax rate"
+          value={tax}
+          onChange={setTax}
+          step={1}
+          suffix="%"
+          max={100}
+          hint="ordinary income rate"
+          info="Your marginal ordinary income tax rate (federal + state combined). RSUs vest as ordinary income, so this drives the withholding at vest. A typical full-time US employee in a high-tax state lands around 35-45%."
+        />
+        <CalcNumber
+          label="LTCG rate"
+          value={ltcg}
+          onChange={setLtcg}
+          step={1}
+          suffix="%"
+          max={100}
+          hint="long-term cap. gains"
+          info="Your long-term capital gains rate. Applies if you hold the shares more than one year past vest before selling. Federal LTCG is 0%, 15%, or 20% depending on income; some states add their own rate."
+        />
       </div>
 
       <div
@@ -61,7 +100,7 @@ export default function RsuCalculator({ profile }: { profile: Profile }) {
           cover withholding. You keep what is left.
         </p>
         <div className="mt-4">
-          <ResultRow label="Value at vest" value={fmt(outcome.valueAtVest)} hint="count × vest price" />
+          <ResultRow label="Value at vest" value={fmt(outcome.valueAtVest)} hint="count × price per share at vest" />
           <ResultRow label="Tax withheld" value={fmt(outcome.taxWithheld)} tone="warning" />
           <ResultRow
             label="Shares delivered to you"

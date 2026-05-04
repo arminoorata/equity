@@ -48,9 +48,28 @@ export default function OfferCompare() {
           min={1}
           max={10}
           step={1}
+          info="The horizon for the comparison. Most equity grants vest over 4 years, so 4 is the common starting point. Cash totals scale linearly with this number; equity is treated as fully vested by the end."
         />
-        <CalcNumber label="Tax rate" value={tax} onChange={setTax} step={1} suffix="%" max={100} />
-        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} hint="long-term cap. gains" />
+        <CalcNumber
+          label="Tax rate"
+          value={tax}
+          onChange={setTax}
+          step={1}
+          suffix="%"
+          max={100}
+          info="Your marginal ordinary income tax rate (federal + state combined). Applied to cash compensation and to RSU equity. A typical full-time US employee in a high-tax state lands around 35-45%."
+        />
+        <CalcNumber
+          label="LTCG rate"
+          value={ltcg}
+          onChange={setLtcg}
+          step={1}
+          suffix="%"
+          max={100}
+          hint="long-term cap. gains"
+          infoTitle="LTCG rate"
+          info="Long-term capital gains rate. The model applies this to option equity, on the assumption you hold long enough to qualify for LTCG treatment. Real outcomes for cashless or short-hold paths land at the ordinary rate instead."
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -188,9 +207,30 @@ function OfferCard({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">
-        <CalcNumber label="Base salary" value={state.base} onChange={(n) => update("base", n)} step={1000} prefix="$" />
-        <CalcNumber label="Signing bonus" value={state.signing} onChange={(n) => update("signing", n)} step={1000} prefix="$" />
-        <CalcNumber label="Target bonus / yr" value={state.bonus} onChange={(n) => update("bonus", n)} step={1000} prefix="$" />
+        <CalcNumber
+          label="Base salary"
+          value={state.base}
+          onChange={(n) => update("base", n)}
+          step={1000}
+          prefix="$"
+          info="Annual base salary in this offer."
+        />
+        <CalcNumber
+          label="Signing bonus"
+          value={state.signing}
+          onChange={(n) => update("signing", n)}
+          step={1000}
+          prefix="$"
+          info="One-time cash sign-on. Added to total comp once, not per year. Often comes with a clawback if you leave within 12-24 months; that detail isn't in the model."
+        />
+        <CalcNumber
+          label="Target bonus / yr"
+          value={state.bonus}
+          onChange={(n) => update("bonus", n)}
+          step={1000}
+          prefix="$"
+          info="Annual target bonus. The actual payout depends on performance, often shown as a percentage of base. Use the target dollar amount, not 100% of stretch."
+        />
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -226,11 +266,32 @@ function OfferCard({
       </div>
 
       <div className="mt-3 flex flex-wrap gap-3">
-        <CalcNumber label="Shares" value={state.shares} onChange={(n) => update("shares", n)} step={100} />
+        <CalcNumber
+          label="Shares"
+          value={state.shares}
+          onChange={(n) => update("shares", n)}
+          step={100}
+          info="Total shares in the equity grant. Most grants vest over 4 years; the model assumes you stay long enough to vest fully."
+        />
         {state.equityType === "option" && (
-          <CalcNumber label="Strike" value={state.strike} onChange={(n) => update("strike", n)} step={0.01} prefix="$" />
+          <CalcNumber
+            label="Strike"
+            value={state.strike}
+            onChange={(n) => update("strike", n)}
+            step={0.01}
+            prefix="$"
+            info="Per-share strike price set at grant. Subtracted from the sale price to get option value."
+          />
         )}
-        <CalcNumber label="Expected sale price" value={state.sale} onChange={(n) => update("sale", n)} step={1} prefix="$" width="180px" />
+        <CalcNumber
+          label="Expected sale price"
+          value={state.sale}
+          onChange={(n) => update("sale", n)}
+          step={1}
+          prefix="$"
+          width="180px"
+          info="Your guess at the per-share price you'd eventually sell at, after a liquidity event. Not a company commitment. The whole comparison hinges on this number, so move it around to see how the answer changes."
+        />
         <CalcNumber
           label="Dilution"
           value={state.dilutionPct}
@@ -240,6 +301,7 @@ function OfferCard({
           max={90}
           hint="future rounds shrinking your slice"
           width="180px"
+          info="A flat haircut on equity value to model future financing rounds diluting your slice. Early-stage companies often see 15-25% dilution per round; pick a number that matches the company's likely funding path."
         />
       </div>
 

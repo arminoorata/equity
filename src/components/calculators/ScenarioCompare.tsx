@@ -56,9 +56,31 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-4">
-        <CalcNumber label="Shares" value={shares} onChange={setShares} step={100} />
-        <CalcNumber label="Strike" value={strike} onChange={setStrike} step={0.01} prefix="$" />
-        <CalcNumber label="FMV today" value={fmv} onChange={setFmv} step={1} prefix="$" hint="Fair Market Value" />
+        <CalcNumber
+          label="Shares"
+          value={shares}
+          onChange={setShares}
+          step={100}
+          info="Vested shares you'd consider exercising. The compare splits these across three timing strategies."
+        />
+        <CalcNumber
+          label="Strike"
+          value={strike}
+          onChange={setStrike}
+          step={0.01}
+          prefix="$"
+          info="Strike price per share, set when your option was granted. Shows on your grant agreement."
+        />
+        <CalcNumber
+          label="FMV today"
+          value={fmv}
+          onChange={setFmv}
+          step={1}
+          prefix="$"
+          hint="Fair Market Value"
+          infoTitle="FMV today"
+          info="Per-share value today. For public companies, the trading price right now. For private companies, the most recent 409A. Drives the spread at exercise (FMV − strike), which is ordinary income for NSO and AMT exposure for ISO."
+        />
         <CalcNumber
           label={`Estimated ${eventLabel}`}
           value={ipo}
@@ -66,9 +88,32 @@ export default function ScenarioCompare({ profile }: { profile: Profile }) {
           step={1}
           prefix="$"
           width="220px"
+          infoTitle={`Estimated ${eventLabel}`}
+          info={isPublic
+            ? "Your guess at the price you'd actually sell at. Could be today's trading price or a future estimate. Not a company commitment."
+            : "Your guess at the per-share price at the future liquidity event (IPO, acquisition, tender, secondary). Not a company commitment. The compare is a sanity check, not a forecast."}
         />
-        <CalcNumber label="Tax rate" value={tax} onChange={setTax} step={1} suffix="%" max={100} hint="ordinary income rate" />
-        <CalcNumber label="LTCG rate" value={ltcg} onChange={setLtcg} step={1} suffix="%" max={100} hint="long-term cap. gains" />
+        <CalcNumber
+          label="Tax rate"
+          value={tax}
+          onChange={setTax}
+          step={1}
+          suffix="%"
+          max={100}
+          hint="ordinary income rate"
+          info="Your marginal ordinary income tax rate (federal + state combined). A typical full-time US employee in a high-tax state lands around 35-45%."
+        />
+        <CalcNumber
+          label="LTCG rate"
+          value={ltcg}
+          onChange={setLtcg}
+          step={1}
+          suffix="%"
+          max={100}
+          hint="long-term cap. gains"
+          infoTitle="LTCG rate"
+          info="Long-term capital gains rate. Applies if shares are held long enough past exercise to qualify for LTCG treatment. Federal LTCG is 0%, 15%, or 20% depending on income."
+        />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

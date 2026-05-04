@@ -137,9 +137,26 @@ export default function PteCalculator() {
           step={100}
           hint={firstOption ? "from your grant" : "edit to model"}
           width="180px"
+          info="Number of options that have vested and would be exercisable today. Pre-fills from the first option grant in your profile if you've set one up."
         />
-        <CalcNumber label="Strike" value={strike} onChange={setStrike} step={0.01} prefix="$" />
-        <CalcNumber label="FMV today" value={fmv} onChange={setFmv} step={1} prefix="$" hint="Fair Market Value" />
+        <CalcNumber
+          label="Strike"
+          value={strike}
+          onChange={setStrike}
+          step={0.01}
+          prefix="$"
+          info="Per-share strike price set at grant. Cost to exercise = vested options × strike."
+        />
+        <CalcNumber
+          label="FMV today"
+          value={fmv}
+          onChange={setFmv}
+          step={1}
+          prefix="$"
+          hint="Fair Market Value"
+          infoTitle="FMV today"
+          info="Per-share value today. For public companies, the trading price. For private companies, the most recent 409A. The gap between FMV and strike is the spread, which drives NSO ordinary tax and ISO AMT exposure at exercise."
+        />
         <CalcNumber
           label="Window"
           value={windowDays}
@@ -147,6 +164,8 @@ export default function PteCalculator() {
           step={1}
           suffix="days"
           width="170px"
+          infoTitle="Post-termination exercise window"
+          info="How many days after leaving the company you have to exercise vested options before they expire. Default is 90 days; some plans extend this to 7-10 years (PTEP / extended exercise window). Check your plan document."
         />
         {type === "nso" && (
           <CalcNumber
@@ -156,6 +175,7 @@ export default function PteCalculator() {
             step={1}
             suffix="%"
             max={100}
+            info="Your marginal ordinary income tax rate (federal + state combined). For NSOs, the spread at exercise is taxed at this rate immediately."
           />
         )}
       </div>
