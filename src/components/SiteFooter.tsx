@@ -50,6 +50,13 @@ export default function SiteFooter() {
             >
               Methodology &amp; sources
             </Link>
+            <Link
+              href="https://arminoorata.com/mark"
+              aria-label="Why A to the n and A to the alpha?"
+              className="hover:text-[var(--accent)] transition-colors"
+            >
+              Why A<sup>n</sup> and A<sup>α</sup>?
+            </Link>
             <p className="mt-2 uppercase tracking-[0.24em]">
               equity.arminoorata.com
             </p>
